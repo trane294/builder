@@ -1,5 +1,5 @@
 {
     "scripts": {
-        "update-library": "cd library && npm run build && npm pack && cd ../generator && npm run build"
+        "update-library": "cd library && npm run build && npm pack && cd ../generator && npm i"
     }
 }
