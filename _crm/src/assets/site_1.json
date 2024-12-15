@@ -1,0 +1,22 @@
+{
+    "components": [
+        {
+            "name": "site",
+            "type": "site",
+            "props": {
+                "title": "Site 1",
+                "description": "Site 1 description",
+                "keywords": "site 1, site, 1",
+                "author": "Site 1 author",
+                "url": "http://site1.com",
+                "image": "http://site1.com/image.jpg",
+                "twitter": "site1",
+                "facebook": "site1",
+                "google": "site1",
+                "type": "website",
+                "locale": "en",
+                "site_name": "Site 1"
+            }
+        }
+    ]
+}
