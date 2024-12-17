@@ -17,26 +17,26 @@ import { Metadata } from "next";
 import { getPage } from "../../../lib/get-page";
 
 export async function generateMetadata({
-  params: { puckPath = [] },
+    params: { puckPath = [] },
 }: {
-  params: { puckPath: string[] };
+    params: { puckPath: string[] };
 }): Promise<Metadata> {
-  const path = `/${puckPath.join("/")}`;
+    const path = `/${puckPath.join("/")}`;
 
-  return {
-    title: "Puck: " + path,
-  };
+    return {
+        title: "Puck: " + path,
+    };
 }
 
 export default async function Page({
-  params: { puckPath = [] },
+    params: { puckPath = [] },
 }: {
-  params: { puckPath: string[] };
+    params: { puckPath: string[] };
 }) {
-  const path = `/${puckPath.join("/")}`;
-  const data = getPage(path);
+    const path = `/${puckPath.join("/")}`;
+    const data = getPage(path);
 
-  return <Client path={path} data={data || {}} />;
+    return <Client path={path} data={data || {}} />;
 }
 
 export const dynamic = "force-dynamic";
