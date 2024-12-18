@@ -11,14 +11,16 @@
     "dependencies": {
         "@ant-design/nextjs-registry": "^1.0.2",
         "@johndoe/library": "file:../library/johndoe-library-0.0.3.tgz",
-        "@measured/puck": "^0.16.2",
+        "@measured/puck": "^0.17.1",
         "antd": "^5.22.5",
+        "bcrypt": "^5.1.1",
         "classnames": "^2.3.2",
         "iron-session": "^8.0.4",
         "next": "15.1.0",
+        "next-auth": "^5.0.0-beta.25",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "swr": "^2.2.5"
+        "zod": "^3.24.1"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
