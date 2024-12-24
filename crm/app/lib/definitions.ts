@@ -44,6 +44,9 @@ export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
     amount: number;
 };
 
+export type InvoiceStatus = 'paid' | 'pending' | 'canceled' | 'overdue';
+
+
 export type InvoicesTable = {
     id: string;
     customer_id: string;
@@ -52,7 +55,7 @@ export type InvoicesTable = {
     image_url: string;
     date: string;
     amount: number;
-    status: 'pending' | 'paid';
+    status: InvoiceStatus;
 };
 
 export type CustomersTableType = {
@@ -84,5 +87,5 @@ export type InvoiceForm = {
     id: string;
     customer_id: string;
     amount: number;
-    status: 'pending' | 'paid';
+    status: InvoiceStatus;
 };
