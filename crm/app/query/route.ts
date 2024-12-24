@@ -1,16 +1,29 @@
 import { db } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 
 const client = await db.connect();
+const prisma = new PrismaClient()
 
 async function listInvoices() {
-	const data = await client.sql`
-    SELECT invoices.amount, customers.name
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE invoices.amount = 666;
-  `;
+    const data = await prisma.invoice.findMany({
+        select: {
+            amount: true,
+            customer: {
+                select: {
+                    name: true
+                }
+            }
+        },
+        // where: {
+        //     amount: 666
+        // }
+    });
 
-	return data.rows;
+    // Transform the data to match the original SQL query structure
+    return data.map(invoice => ({
+        amount: invoice.amount,
+        name: invoice.customer.name
+    }));
 }
 
 export async function GET() {
@@ -20,8 +33,8 @@ export async function GET() {
     // });
 
     try {
-    	return Response.json(await listInvoices());
+        return Response.json(await listInvoices());
     } catch (error) {
-    	return Response.json({ error }, { status: 500 });
+        return Response.json({ error }, { status: 500 });
     }
 }
