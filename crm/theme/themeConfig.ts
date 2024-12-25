@@ -6,7 +6,7 @@ const theme: ThemeConfig = {
     // algorithm: AntTheme.compactAlgorithm,
     token: {
         fontSize: 16,
-        colorPrimary: '#52C41A',
+        // colorPrimary: '#52C41A',
     },
     components: {
         Layout: {

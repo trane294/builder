@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Flex, Layout as AntLayout } from 'antd';
 import SideNav from '@/app/ui/dashboard/sidenav';
 
@@ -13,6 +13,8 @@ export default function Layout({
 }: {
     children: React.ReactNode
 }) {
+    // const [collapsed, setCollapsed] = useState(false);
+
     return (
         <Flex
             gap="middle"
@@ -20,6 +22,9 @@ export default function Layout({
         >
             <AntLayout>
                 <Sider
+                    // collapsible
+                    // collapsed={collapsed}
+                    // onCollapse={(value) => setCollapsed(value)}
                     width="20%"
                     theme="light"
                 >
