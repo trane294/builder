@@ -8,7 +8,9 @@
         "seed": "tsx prisma/seed.ts"
     },
     "dependencies": {
+        "@johndoe/library": "file:../library/johndoe-library-0.0.3.tgz",
         "@heroicons/react": "^2.2.0",
+        "@measured/puck": "^0.17.1",
         "@prisma/client": "6.1.0",
         "@tailwindcss/forms": "^0.5.9",
         "@vercel/postgres": "^0.10.0",
