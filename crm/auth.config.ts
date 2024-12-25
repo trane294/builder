@@ -14,11 +14,10 @@ export const authConfig = {
 
                 return false;
             } else if (isLoggedIn) {
-                // return Response.redirect(new URL('/dashboard', nextUrl));
+                return Response.redirect(new URL('/dashboard', nextUrl));
             }
 
-            // return false;
-            return true;
+            return false;
         },
     },
     providers: [

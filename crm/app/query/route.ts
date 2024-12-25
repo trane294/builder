@@ -1,8 +1,5 @@
 import { db } from '@vercel/postgres';
-import { PrismaClient } from '@prisma/client';
-
-const client = await db.connect();
-const prisma = new PrismaClient()
+import prisma from '@/app/lib/prisma';
 
 async function listInvoices() {
     const data = await prisma.invoice.findMany({
@@ -12,11 +9,12 @@ async function listInvoices() {
                 select: {
                     name: true
                 }
-            }
+            },
         },
-        // where: {
-        //     amount: 666
-        // }
+        where: {
+            // amount: 666
+            // deletedAt: null
+        }
     });
 
     // Transform the data to match the original SQL query structure
