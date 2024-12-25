@@ -1,6 +1,6 @@
 import {
     ProjectField
-} from '@/app/lib/core/definitions';
+} from '@/lib/core/definitions';
 import prisma from '../../core/prisma';
 
 export async function fetchProjects() {
