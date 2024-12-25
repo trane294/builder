@@ -23,7 +23,7 @@ export default function Layout({
                     width="20%"
                     theme="light"
                 >
-                    {/* <SideNav /> */}
+                    <SideNav />
                 </Sider>
                 <AntLayout>
                     <Header>
