@@ -1,14 +1,42 @@
+'use client';
+
+import React from 'react';
+import { Flex, Layout as AntLayout } from 'antd';
 import SideNav from '@/app/ui/dashboard/sidenav';
+
+const { Header, Footer, Sider, Content } = AntLayout;
 
 export const experimental_ppr = true;
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({
+    children
+}: {
+    children: React.ReactNode
+}) {
     return (
-        <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-            <div className="w-full flex-none md:w-64">
-                <SideNav />
-            </div>
-            <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
-        </div>
+        <Flex
+            gap="middle"
+            wrap
+        >
+            <AntLayout>
+                <Sider
+                    width="20%"
+                    theme="light"
+                >
+                    {/* <SideNav /> */}
+                </Sider>
+                <AntLayout>
+                    <Header>
+                        Header
+                    </Header>
+                    <Content>
+                        {children}
+                    </Content>
+                    <Footer>
+                        Footer
+                    </Footer>
+                </AntLayout>
+            </AntLayout>
+        </Flex>
     );
 }
