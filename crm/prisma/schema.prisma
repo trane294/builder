@@ -50,7 +50,8 @@ model User {
 model Project {
     id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
     name        String    @db.VarChar(255)
-    description String
+    description String?
+    template    Json?
     user_id     String    @db.Uuid
     user        User      @relation(fields: [user_id], references: [id])
     createdAt   DateTime  @default(now()) @db.Timestamptz(6)

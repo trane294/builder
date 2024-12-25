@@ -89,3 +89,8 @@ export type InvoiceForm = {
     amount: number;
     status: InvoiceStatus;
 };
+
+export type ProjectField = {
+    id: string;
+    name: string;
+};

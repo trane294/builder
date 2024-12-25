@@ -6,13 +6,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        // <html lang="en">
-        //     <body>
         <div>
-            123
             {children}
         </div>
-        //     </body>
-        // </html>
     );
 };

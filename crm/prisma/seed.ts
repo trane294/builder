@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
-// Replace the below imports with wherever your data arrays are defined.
-import { users, customers, invoices, revenue } from '../app/lib/placeholder-data';
+import { users, customers, invoices, revenue, projects } from '@/app/lib/shared/placeholder-data';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +22,7 @@ async function main() {
         });
     }
 
-    // 2. Seed Customers
+    // // 2. Seed Customers
     for (const customer of customers) {
         await prisma.customer.upsert({
             where: { id: customer.id },
@@ -37,18 +36,19 @@ async function main() {
         });
     }
 
-    // 3. Seed Invoices
+    // // 3. Seed Invoices
     for (const invoice of invoices) {
-        for (const invoice of invoices) {
-            await prisma.invoice.create({
-                data: {
-                    customer_id: invoice.customer_id,
-                    amount: invoice.amount,
-                    status: invoice.status,
-                    date: new Date(invoice.date),
-                },
-            });
-        }
+        await prisma.invoice.upsert({
+            where: { id: invoice.id },
+            update: {},
+            create: {
+                id: invoice.id,
+                customer_id: invoice.customer_id,
+                amount: invoice.amount,
+                status: invoice.status,
+                date: new Date(invoice.date),
+            },
+        });
     }
 
     // 4. Seed Revenue
@@ -59,6 +59,19 @@ async function main() {
             create: {
                 month: rev.month,
                 revenue: rev.revenue,
+            },
+        });
+    }
+
+    // 5. Seed Projects
+    for (const project of projects) {
+        await prisma.project.upsert({
+            where: { id: project.id },
+            update: {},
+            create: {
+                id: project.id,
+                name: project.name,
+                user_id: project.user_id,
             },
         });
     }

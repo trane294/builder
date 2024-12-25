@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 export const metadata: Metadata = {
     title: {
@@ -19,7 +20,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.className} antialiased`}>
-                {children}
+                <AntdRegistry>
+                    {children}
+                </AntdRegistry>
             </body>
         </html>
     );
