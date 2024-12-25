@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 prisma.$use(async (params, next) => {
     // For example, if your pivot table model is named `UserRole` or `PostTag`, skip the soft-delete logic
     const modelsToExclude = ['Revenue'];
-    console.log(params);
 
     if (modelsToExclude.includes(params.model ?? '')) {
         // Just run the query as-is for these models
