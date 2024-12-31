@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
-import { users, customers, invoices, revenue, projects } from '@/lib/shared/placeholder-data';
+import { users, customers, invoices, revenue, projects } from '@/app/lib/shared/placeholder-data';
 
 const prisma = new PrismaClient();
 

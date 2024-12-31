@@ -1,6 +1,7 @@
 import './styles.css';
 
-export default function RootLayout({
+export default function Layout({
+// export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;

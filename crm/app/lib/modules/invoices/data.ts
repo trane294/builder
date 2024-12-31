@@ -7,9 +7,9 @@ import {
     InvoiceStatus,
     LatestInvoiceRaw,
     Revenue,
-} from '@/lib/core/definitions';
-import { formatCurrency } from '@/lib/core/utils';
-import prisma from '../../core/prisma';
+} from '@/app/lib/core/definitions';
+import { formatCurrency } from '@/app/lib/core/utils';
+import prisma from '@/app/lib/core/prisma';
 
 export async function fetchRevenue() {
     try {

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card as AntCard } from 'antd';
-import { fetchProjects } from '@/lib/modules/projects/data';
-import { ProjectField } from '@/lib/core/definitions';
+import { fetchProjects } from '@/app/lib/modules/projects/data';
+import { ProjectField } from '@/app/lib/core/definitions';
 import { Col, Row } from 'antd';
 
 export default async function ProjectsCardWrapper() {

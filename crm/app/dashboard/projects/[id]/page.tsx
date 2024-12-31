@@ -5,7 +5,7 @@ export default function Page() {
     return <div>
         <p>Project Page</p>
         <Link
-            href="/dashboard/projects/1/editor"
+            href="/editor/1"
         >
             <Button>Edit</Button>
         </Link>

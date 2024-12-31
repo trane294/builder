@@ -1,6 +1,6 @@
 import {
     ProjectField
-} from '@/lib/core/definitions';
+} from '@/app/lib/core/definitions';
 import prisma from '../../core/prisma';
 
 export async function fetchProjects() {
@@ -23,6 +23,6 @@ export async function fetchProjects() {
         return results;
     } catch (err) {
         console.error('Database Error:', err);
-        throw new Error('Failed to fetch all projects.');
+        throw new Error('Failed to fetch all projects');
     }
 }

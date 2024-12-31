@@ -1,5 +1,5 @@
 import { db } from '@vercel/postgres';
-import prisma from '@/lib/core/prisma';
+import prisma from '@/app/lib/core/prisma';
 
 async function listInvoices() {
     const data = await prisma.invoice.findMany({

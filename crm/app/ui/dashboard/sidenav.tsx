@@ -82,7 +82,7 @@ export default function SideNav() {
             <div style={{
                 height: '32px',
                 margin: '16px',
-                background: 'rgba(255, 255, 255, .2)',
+                background: 'rgba(0, 0, 0, .2)',
                 borderRadius: '6px'
             }} />
             <Menu theme="light" defaultSelectedKeys={['1']} mode="inline" items={items} />
