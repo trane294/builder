@@ -7,7 +7,7 @@ import { signOut } from '@/app/lib/modules/auth/actions';
 
 const { Header, Footer, Sider, Content } = AntLayout;
 
-export const experimental_ppr = true;
+// export const experimental_ppr = true;
 
 export default function Layout({
     children

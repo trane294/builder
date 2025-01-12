@@ -10,6 +10,7 @@ import {
 } from '@/app/lib/core/definitions';
 import { formatCurrency } from '@/app/lib/core/utils';
 import prisma from '@/app/lib/core/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function fetchRevenue() {
     try {
@@ -60,7 +61,7 @@ export async function fetchFilteredInvoices(
 ) {
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-    const orConditions: any[] = [
+    const orConditions: Prisma.InvoiceWhereInput[] = [
         { customer: { name: { contains: query, mode: 'insensitive' } } },
         { customer: { email: { contains: query, mode: 'insensitive' } } },
         { status: { contains: query, mode: 'insensitive' } },
@@ -118,7 +119,7 @@ export async function fetchFilteredInvoices(
 }
 
 export async function fetchInvoicesPages(query: string) {
-    const orConditions: any[] = [
+    const orConditions: Prisma.InvoiceWhereInput[] = [
         { customer: { name: { contains: query, mode: 'insensitive' } } },
         { customer: { email: { contains: query, mode: 'insensitive' } } },
         { status: { contains: query, mode: 'insensitive' } },

@@ -52,8 +52,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
             },
         });
     } catch (error) {
-        // @ts-ignore
-        console.log(error.stack);
+        // console.log(error.stack);
 
         return {
             message: 'Failed creating invoice',
@@ -95,8 +94,7 @@ export async function updateInvoice(
             },
         });
     } catch (error) {
-        // @ts-ignore
-        console.log(error.stack);
+        // console.log(error.stack);
 
         return { message: 'Database Error: Failed to Update Invoice.' };
     }

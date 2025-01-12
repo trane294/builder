@@ -8,25 +8,24 @@ import prisma from '@/app/lib/core/prisma';
 export async function updateProject(
     id: string,
     data: Partial<Data>,
-    path: string,
+    pagePath: string
 ) {
-    // console.log(id, data, path);
-
     try {
         await prisma.project.update({
-            where: { id: '410544b2-4001-4271-3451-fec4b6a6442a' },
+            where: {
+                id: id
+            },
             data: {
                 template: data
             },
         });
     } catch (error) {
-        // @ts-ignore
-        console.log(error.stack);
+        // console.log(error.stack);
 
         return { message: 'Database Error: Failed to update Project.' };
     }
 
-    revalidatePath(path);
+    revalidatePath(pagePath);
 
     // const payload = await request.json();
 
