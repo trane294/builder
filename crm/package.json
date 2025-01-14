@@ -1,51 +1,28 @@
 {
-    "private": true,
-    "scripts": {
-        "build": "next build",
-        "dev": "next dev",
-        "_dev": "next dev --turbopack",
-        "start": "next start",
-        "lint": "next lint",
-        "seed": "tsx prisma/seed.ts"
-    },
-    "dependencies": {
-        "@ant-design/colors": "^7.1.0",
-        "@ant-design/cssinjs": "^1.22.1",
-        "@ant-design/icons": "^5.5.2",
-        "@ant-design/nextjs-registry": "^1.0.2",
-        "@heroicons/react": "^2.2.0",
-        "@johndoe/library": "file:../library/johndoe-library-0.0.3.tgz",
-        "@measured/puck": "^0.17.1",
-        "@prisma/client": "6.1.0",
-        "@tailwindcss/forms": "^0.5.9",
-        "@vercel/postgres": "^0.10.0",
-        "antd": "^5.23.0",
-        "autoprefixer": "10.4.20",
-        "axios": "^1.7.9",
-        "bcrypt": "^5.1.1",
-        "clsx": "^2.1.1",
-        "fs": "0.0.1-security",
-        "next": "15.1.4",
-        "next-auth": "5.0.0-beta.25",
-        "postcss": "8.4.49",
-        "react": "19.0.0",
-        "react-dom": "19.0.0",
-        "tailwindcss": "3.4.16",
-        "typescript": "5.7.2",
-        "use-debounce": "^10.0.4",
-        "uuid": "^11.0.3",
-        "zod": "^3.23.8"
-    },
-    "devDependencies": {
-        "@ant-design/v5-patch-for-react-19": "^1.0.3",
-        "@types/bcrypt": "^5.0.2",
-        "@types/node": "22.10.1",
-        "@types/react": "19.0.0",
-        "@types/react-dom": "19.0.0",
-        "eslint": "^9",
-        "eslint-config-next": "15.1.2",
-        "prisma": "^6.1.0",
-        "ts-node": "^10.9.2",
-        "tsx": "^4.19.2"
-    }
+  "name": "crm",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon -w src/server -x tsx src/server/main.ts",
+    "start": "NODE_ENV=production tsx src/server/main.ts",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tsx": "^4.3.0",
+    "typescript": "^5.3.2",
+    "vite-express": "*"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.9.3",
+    "@types/react": "^18.0.38",
+    "@types/react-dom": "^18.2.16",
+    "@vitejs/plugin-react": "^4.2.0",
+    "nodemon": "^3.0.1",
+    "vite": "^5.0.2"
+  }
 }

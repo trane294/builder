@@ -1,60 +1,34 @@
-'use client';
-
-import React from 'react';
+import { Metadata } from 'next';
+import '@/app/ui/global.css';
+import { inter } from '@/app/ui/fonts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import '@ant-design/v5-patch-for-react-19';
+import { ConfigProvider } from 'antd';
+import theme from '@/theme/themeConfig';
 
-import './styles.css';
-
-const { Header, Content, Footer } = Layout;
-const { Item: BreadcrumbItem } = Breadcrumb;
-
-const items = new Array(3).fill(null).map((_, index) => ({
-    key: index + 1,
-    label: `nav ${index + 1}`,
-}));
+export const metadata: Metadata = {
+    title: {
+        template: '%s | Acme Dashboard',
+        default: 'Acme Dashboard',
+    },
+    description: 'The official Next.js Learn Dashboard built with App Router.',
+    metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+};
 
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken();
-
     return (
         <html lang="en">
-            <body>
+            <body className={`${inter.className} antialiased`}>
                 <AntdRegistry>
-                    <Layout>
-                        <Header style={{ display: 'flex', alignItems: 'center' }}>
-                            <div className="demo-logo" />
-                            <Menu
-                                theme="dark"
-                                mode="horizontal"
-                                defaultSelectedKeys={['2']}
-                                items={items}
-                                style={{ flex: 1, minWidth: 0 }}
-                            />
-                        </Header>
-                        <Content style={{ padding: '0 48px' }}>
-                            <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Home' }, { title: 'App' }]} />
-                            <div
-                                style={{
-                                    padding: 24,
-                                    minHeight: 380,
-                                    background: colorBgContainer,
-                                    borderRadius: borderRadiusLG,
-                                }}
-                            >
-                                {children}
-                            </div>
-                        </Content>
-                        <Footer style={{ textAlign: 'center' }}>
-                            App ©{new Date().getFullYear()}
-                        </Footer>
-                    </Layout>
+                    <ConfigProvider
+                        theme={theme}
+                    >
+                        {children}
+                    </ConfigProvider>
                 </AntdRegistry>
             </body>
         </html>

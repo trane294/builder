@@ -4,9 +4,9 @@ import { Button, PageContainer, Hero, Section1 } from '@johndoe/library';
 type Props = {
     HeadingBlock: { title: string };
     Button: { title: string };
-    // PageContainer: { children: React.ReactNode };
+    PageContainer: { children: React.ReactNode };
     Hero: {};
-    Section: {};
+    Section1: {};
 };
 
 export const config: Config<Props> = {
@@ -42,23 +42,23 @@ export const config: Config<Props> = {
                 <Button>{title}</Button>
             ),
         },
-        // PageContainer: {
-        //     fields: {
-        //         children: <div />,
-        //     },
-        //     defaultProps: {
-        //         children: <div />,
-        //     },
-        //     render: ({ children }) => (
-        //         <PageContainer>{children}</PageContainer>
-        //     ),
-        // },
+        PageContainer: {
+            fields: {
+                children: <div />,
+            },
+            defaultProps: {
+                children: <div />,
+            },
+            render: ({ children }) => (
+                <PageContainer>{children}</PageContainer>
+            ),
+        },
         Hero: {
             fields: {},
             defaultProps: {},
             render: () => <Hero />,
         },
-        Section: {
+        Section1: {
             fields: {},
             defaultProps: {},
             render: () => <Section1 />,
