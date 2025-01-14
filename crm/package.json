@@ -19,7 +19,7 @@
         "@prisma/client": "6.1.0",
         "@tailwindcss/forms": "^0.5.9",
         "@vercel/postgres": "^0.10.0",
-        "antd": "^5.22.6",
+        "antd": "^5.23.0",
         "autoprefixer": "10.4.20",
         "axios": "^1.7.9",
         "bcrypt": "^5.1.1",
@@ -37,6 +37,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@ant-design/v5-patch-for-react-19": "^1.0.3",
         "@types/bcrypt": "^5.0.2",
         "@types/node": "22.10.1",
         "@types/react": "19.0.0",

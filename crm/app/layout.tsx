@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import '@ant-design/v5-patch-for-react-19';
 import { ConfigProvider } from 'antd';
 import theme from '@/theme/themeConfig';
 

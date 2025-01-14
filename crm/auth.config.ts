@@ -17,6 +17,12 @@ export const authConfig = {
                 return Response.redirect(new URL('/dashboard', nextUrl));
             }
 
+            if (nextUrl.pathname.startsWith('/signup')) {
+                if (isLoggedIn) return Response.redirect(new URL('/dashboard', nextUrl));
+
+                return true;
+            }
+
             return false;
         },
     },
