@@ -3,7 +3,6 @@ import { Button, Checkbox, Form, Input } from 'antd';
 import { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from 'src/hooks';
 import { loginUser } from 'src/features/auth/authActions';
-import { useNavigate } from 'react-router';
 
 type LoginFieldType = {
     username?: string;
@@ -12,7 +11,6 @@ type LoginFieldType = {
 };
 
 const LoginForm = () => {
-    const navigate = useNavigate();
     const { loading, userToken, error, success } = useAppSelector(
         (state) => state.auth
     );

@@ -1,3 +1,5 @@
+import './DashboardLayout.scss';
+
 import React from 'react';
 import {
     AppstoreOutlined,

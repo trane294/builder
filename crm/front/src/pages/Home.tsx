@@ -2,29 +2,23 @@ import type { RootState } from 'src/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { decrement, increment } from 'src/features/counter/counterSlice';
 import Header from 'src/components/Header';
+import { NavLink } from 'react-router';
 
 function Home() {
-    // const count = useSelector((state: RootState) => state.counter.value);
-    // const dispatch = useDispatch();
-
     return (
         <>
             <div>
+                <Header />
+
                 <div>
-                    <Header />
-                    {/* <button
-                        aria-label="Increment value"
-                        onClick={() => dispatch(increment())}
-                    >
-                        Increment
-                    </button>
-                    <span>{count}</span>
-                    <button
-                        aria-label="Decrement value"
-                        onClick={() => dispatch(decrement())}
-                    >
-                        Decrement
-                    </button> */}
+                    <NavLink to={`/project/1`}>
+                        Project 1
+                    </NavLink>
+                </div>
+                <div>
+                    <NavLink to={`/project/2`}>
+                        Project 2
+                    </NavLink>
                 </div>
             </div>
         </>
