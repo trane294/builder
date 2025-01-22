@@ -1,4 +1,6 @@
+import 'antd/dist/reset.css';
 import 'src/index.css';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -18,6 +20,7 @@ import Home from 'src/pages/Home.tsx';
 import Login from 'src/pages/Login.tsx';
 import Register from 'src/pages/Register.tsx';
 import ProtectedRoute from 'src/components/ProtectedRoute';
+import AuthLayout from 'src/components/AuthLayout';
 
 // const routes = createRoutesFromElements(
 //     <>
@@ -45,8 +48,10 @@ createRoot(document.getElementById('root')!).render(
         <Provider store={store}>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                    <Route element={<AuthLayout />}>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                    </Route>
 
                     <Route element={<ProtectedRoute />}>
                         <Route element={<DashboardLayout />}>
