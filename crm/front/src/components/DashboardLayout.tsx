@@ -1,10 +1,10 @@
-import './DashboardLayout.scss';
-
 import React from 'react';
 import {
     AppstoreOutlined,
     BarChartOutlined,
     CloudOutlined,
+    MailOutlined,
+    SearchOutlined,
     ShopOutlined,
     TeamOutlined,
     UploadOutlined,
@@ -12,8 +12,12 @@ import {
     VideoCameraOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Layout, Menu, theme } from 'antd';
+import { Col, Dropdown, Input, Layout, Menu, Row, theme } from 'antd';
 import { Outlet } from 'react-router';
+import AvatarImg from 'src/assets/images/avatar.svg';
+import { logout } from 'src/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from 'src/store';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -44,23 +48,65 @@ const items: MenuProps['items'] = [
 }));
 
 const DashboardLayout = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const {
         token: { colorBgContainer },
     } = theme.useToken();
 
-    // TODO: move to account
-    // useEffect(() => {
-    //     dispatch(fetchAccount());
-    // }, []);
+    const dropdownItems: MenuProps['items'] = [
+        {
+            key: '1',
+            label: 'Logout',
+            onClick: () => dispatch(logout()),
+        }
+    ];
 
     return (
         <Layout hasSider>
             <Sider style={siderStyle}>
                 <div className="demo-logo-vertical" />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']} items={items} />
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    defaultSelectedKeys={['4']}
+                    items={items}
+                />
             </Sider>
             <Layout style={{ marginInlineStart: 200 }}>
-                <Header style={{ padding: 0, background: colorBgContainer }} />
+                <Header style={{ padding: 0, background: colorBgContainer }}>
+                    <Row
+                        align="middle"
+                        style={{
+                            paddingInline: 24
+                        }}
+                    >
+                        <Col flex={2}>Logo Project</Col>
+                        <Col style={{ textAlign: "right", marginLeft: 25 }}>
+                            Welcome John Cena
+                        </Col>
+                        <Col>
+                            <Dropdown
+                                menu={{ items: dropdownItems }}
+                                placement="bottomRight"
+                            >
+                                <div
+                                    style={{
+                                        height: 40,
+                                        width: 40,
+                                        backgroundColor: "#545B64",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        borderRadius: "50%",
+                                        marginLeft: 14
+                                    }}
+                                >
+                                    <img src={AvatarImg} alt="Avatar" />
+                                </div>
+                            </Dropdown>
+                        </Col>
+                    </Row>
+                </Header>
                 <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
                     <Outlet />
                 </Content>
