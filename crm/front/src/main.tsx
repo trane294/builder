@@ -1,3 +1,4 @@
+
 import 'src/index.scss';
 
 import { StrictMode } from 'react';
@@ -18,6 +19,7 @@ import ProtectedRoute from 'src/components/ProtectedRoute';
 import AuthLayout from 'src/components/AuthLayout';
 import ProjectPage from 'src/pages/ProjectPage';
 import EditorPage from 'src/pages/EditorPage';
+import EditorPreviewPage from 'src/pages/EditorPreviewPage';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -40,6 +42,7 @@ createRoot(document.getElementById('root')!).render(
 
                         <Route path="editor">
                             <Route path=":id" element={<EditorPage />} />
+                            <Route path=":id/preview" element={<EditorPreviewPage />} />
                         </Route>
                     </Route>
                 </Routes>

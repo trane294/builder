@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@measured/puck": "^0.17.4",
     "@reduxjs/toolkit": "^2.5.0",
     "antd": "^5.23.1",
@@ -32,6 +34,6 @@
     "sass": "^1.83.4",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"
+    "vite": "^6.0.7"
   }
 }
