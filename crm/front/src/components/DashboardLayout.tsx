@@ -3,8 +3,6 @@ import {
     AppstoreOutlined,
     BarChartOutlined,
     CloudOutlined,
-    MailOutlined,
-    SearchOutlined,
     ShopOutlined,
     TeamOutlined,
     UploadOutlined,
@@ -12,7 +10,7 @@ import {
     VideoCameraOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Col, Dropdown, Input, Layout, Menu, Row, theme } from 'antd';
+import { Col, Dropdown, Layout, Menu, Row, theme } from 'antd';
 import { Outlet } from 'react-router';
 import AvatarImg from 'src/assets/images/avatar.svg';
 import { logout } from 'src/features/auth/authSlice';
@@ -58,7 +56,7 @@ const DashboardLayout = () => {
             key: '1',
             label: 'Logout',
             onClick: () => dispatch(logout()),
-        }
+        },
     ];
 
     return (
@@ -77,11 +75,11 @@ const DashboardLayout = () => {
                     <Row
                         align="middle"
                         style={{
-                            paddingInline: 24
+                            paddingInline: 24,
                         }}
                     >
                         <Col flex={2}>Logo Project</Col>
-                        <Col style={{ textAlign: "right", marginLeft: 25 }}>
+                        <Col style={{ textAlign: 'right', marginLeft: 25 }}>
                             Welcome John Cena
                         </Col>
                         <Col>
@@ -93,12 +91,12 @@ const DashboardLayout = () => {
                                     style={{
                                         height: 40,
                                         width: 40,
-                                        backgroundColor: "#545B64",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        borderRadius: "50%",
-                                        marginLeft: 14
+                                        backgroundColor: '#545B64',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: '50%',
+                                        marginLeft: 14,
                                     }}
                                 >
                                     <img src={AvatarImg} alt="Avatar" />
