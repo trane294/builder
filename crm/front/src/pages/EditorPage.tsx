@@ -1,111 +1,70 @@
-import { Config, Puck } from '@measured/puck';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
+import { Puck, Config } from '@measured/puck';
 import '@measured/puck/puck.css';
-import FooterPhoto1 from 'src/templates/photo-1/footer';
-import HeroPhoto1 from 'src/templates/photo-1/hero';
-import LayoutPhoto1 from 'src/templates/photo-1/layout';
-import MenuPhoto1 from 'src/templates/photo-1/menu';
-import SectionPhoto1 from 'src/templates/photo-1/section';
+import { photo1Config } from 'src/templates/photo-1/config';
 
-type Components = {
-    HeroPhoto1: {
-        children: string;
+type EditorPageProps = {};
+
+export default function EditorPage(props: EditorPageProps) {
+    const { id: templateId } = useParams<{ id: string }>();
+    const params = useParams();
+    const [config, setConfig] = useState<Config<any, any> | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Example: some initial data
+    const [initialData] = useState<Record<string, any>>({});
+
+    // A function to handle Puck's onPublish
+    const save = (data: Record<string, any>) => {
+        console.log('onPublish data:', data);
+        // Could POST to your server to store the data
     };
-    MenuPhoto1: {
-        children: string;
-    };
-    SectionPhoto1: {
-        children: string;
-    };
-    FooterPhoto1: {
-        children: string;
-    };
-};
 
-type RootProps = {
-    title: string;
-};
+    // Fetch config from your API whenever templateId changes
+    useEffect(() => {
+        // if (!templateId) return;
 
-const config: Config<Components, RootProps> = {
-    components: {
-        HeroPhoto1: {
-            fields: {
-                children: {
-                    type: 'text',
-                },
-            },
-            render: ({ children }) => {
-                return (
-                    <>
-                        <HeroPhoto1></HeroPhoto1>
-                    </>
-                );
-            },
-        },
-        MenuPhoto1: {
-            fields: {
-                children: {
-                    type: 'text',
-                },
-            },
-            render: ({ children }) => {
-                return (
-                    <>
-                        <MenuPhoto1></MenuPhoto1>
-                    </>
-                );
-            },
-        },
-        SectionPhoto1: {
-            fields: {
-                children: {
-                    type: 'text',
-                },
-            },
-            render: ({ children }) => {
-                return (
-                    <>
-                        <SectionPhoto1></SectionPhoto1>
-                    </>
-                );
-            },
-        },
-        FooterPhoto1: {
-            fields: {
-                children: {
-                    type: 'text',
-                },
-            },
-            render: ({ children }) => {
-                return (
-                    <>
-                        <FooterPhoto1></FooterPhoto1>
-                    </>
-                );
-            },
-        },
-    },
-    root: {
-        fields: {
-            title: {
-                type: 'text',
-            },
-        },
-        render: ({ children }) => {
-            return (
-                <>
-                    <LayoutPhoto1>{children}</LayoutPhoto1>
-                </>
-            );
-        },
-    },
-};
+        // setLoading(true);
+        // setError(null);
 
-const initialData: Record<string, any> = {};
+        // fetch(`http://localhost:4000/api/templates/${templateId}`)
+        //     .then((res) => {
+        //         if (!res.ok) {
+        //             throw new Error(`Failed to fetch config: ${res.status}`);
+        //         }
+        //         return res.json();
+        //     })
+        //     .then((fetchedConfig) => {
+        //         setConfig(fetchedConfig);
+        //         setLoading(false);
+        //     })
+        //     .catch((err) => {
+        //         console.error(err);
+        //         setError(err.message);
+        //         setLoading(false);
+        //     });
 
-const save = (data: Record<string, any>) => {
-    console.log(data);
-};
+        setConfig(photo1Config);
+        setLoading(false);
+    }, [templateId]);
 
-export default function EditorPage() {
+    if (!templateId) {
+        return <div>No template id provided.</div>;
+    }
+
+    if (loading) {
+        return <div>Loading template config...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!config) {
+        return <div>No config found.</div>;
+    }
+
     return <Puck config={config} data={initialData} onPublish={save} />;
 }
