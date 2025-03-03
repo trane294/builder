@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
-import user_routes from '../routes/index';
 import helmet from 'helmet';
+
+import userRoutes from '../routes/userRoutes';
+
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-
 const cors = require('cors');
-
 const app = express();
 
 app.use(helmet());
@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
 
-user_routes(app);
+// Mounting routes
+app.use('/api/user', userRoutes);
 
 export default app;
