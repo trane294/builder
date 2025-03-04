@@ -1,4 +1,5 @@
 import app from './infrastructure/server';
+import swaggerDocs from './infrastructure/swagger';
 import logger from './infrastructure/winston';
 import * as dotenv from 'dotenv';
 
@@ -9,6 +10,7 @@ async function main() {
 
     app.listen(port, async () => {
         logger.info(`App is running at http://localhost:${port}`);
+        swaggerDocs(app, port.toString());
     });
 }
 
