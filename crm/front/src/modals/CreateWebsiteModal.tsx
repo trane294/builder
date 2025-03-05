@@ -7,8 +7,10 @@ import { Modal as AntModal, Button, Card, Row, Col } from 'antd';
 import {
     useCreateWebsiteMutation,
     useGetWebsitesQuery,
+    useGetWebsiteTemplatesQuery,
 } from 'src/services/website/websiteService';
 import { useAppSelector } from 'src/hooks';
+import { ITemplate } from 'src/types';
 
 const activeCardStyle = {
     boxShadow:
@@ -21,28 +23,33 @@ const CreateWebsiteModal: React.FC = () => {
         (state: RootState) => state.modal
     );
     const { userInfo } = useAppSelector((state) => state.auth);
-    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(
+    const [selectedTemplate, setSelectedTemplate] = useState<ITemplate | null>(
         null
     );
     const [createWebsite, { isLoading, isError, error }] =
         useCreateWebsiteMutation();
+    const {
+        data: templates,
+        isLoading: isLoadingT,
+        isError: isErrorT,
+        error: errorT,
+    } = useGetWebsiteTemplatesQuery();
     const { refetch: refetchWebsites } = useGetWebsitesQuery();
 
-    if (!isOpen || !componentName || !userInfo) return null;
+    if (!userInfo) return null;
 
-    const templates = ['Template 1', 'Template 2', 'Template 3'];
-
-    const handleTemplateSelect = (template: string) => {
+    const handleTemplateSelect = (template: ITemplate) => {
         setSelectedTemplate(template);
     };
 
     const handleCreateWebsite = async () => {
         if (selectedTemplate) {
             try {
-                const formattedDateTime = DateTime.now().toFormat('dd.MM.yyyy HH:mm');
+                const formattedDateTime =
+                    DateTime.now().toFormat('dd.MM.yyyy HH:mm');
                 await createWebsite({
                     name: 'Website ' + formattedDateTime,
-                    templateId: 1,
+                    templateId: selectedTemplate.id,
                     userId: userInfo.id,
                 });
                 dispatch(closeModal());
@@ -57,6 +64,10 @@ const CreateWebsiteModal: React.FC = () => {
             console.error('Please select a template');
         }
     };
+
+    if (!templates || isLoadingT) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <AntModal
@@ -77,8 +88,8 @@ const CreateWebsiteModal: React.FC = () => {
             ]}
         >
             <Row gutter={[16, 16]}>
-                {templates.map((template) => (
-                    <Col xs={24} sm={12} md={8} lg={6} key={template}>
+                {templates.map((template, key) => (
+                    <Col xs={24} sm={12} md={8} lg={6} key={key}>
                         {' '}
                         <Card
                             hoverable
@@ -90,7 +101,7 @@ const CreateWebsiteModal: React.FC = () => {
                                     : {}
                             }
                         >
-                            {template}
+                            {template.name}
                         </Card>
                     </Col>
                 ))}

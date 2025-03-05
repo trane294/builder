@@ -1,12 +1,18 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithAuth } from '../baseQueryWithAuth';
-import { ICreateWebsite, IWebsite } from 'src/types';
+import { ICreateWebsite, ITemplate, IWebsite } from 'src/types';
 
 export const websiteApi = createApi({
     reducerPath: 'websiteApi',
     baseQuery: baseQueryWithAuth,
     endpoints: (builder) => ({
-        getWebsites: builder.query<any, void>({
+        getWebsiteTemplates: builder.query<ITemplate[], void>({
+            query: () => ({
+                url: 'website/templates',
+                method: 'GET',
+            }),
+        }),
+        getWebsites: builder.query<IWebsite[], void>({
             query: () => ({
                 url: 'website',
                 method: 'GET',
@@ -40,4 +46,5 @@ export const {
     useCreateWebsiteMutation,
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
+    useGetWebsiteTemplatesQuery,
 } = websiteApi;

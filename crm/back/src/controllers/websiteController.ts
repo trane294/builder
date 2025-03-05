@@ -181,6 +181,12 @@ export const getWebsiteById = async (
                         lastName: true,
                     },
                 },
+                template: {
+                    select: {
+                        name: true,
+                        config: true,
+                    },
+                },
             },
         });
 
@@ -514,6 +520,68 @@ export const deleteWebsite = async (
         res.status(200).json({ message: "Website deleted successfully" });
     } catch (error: any) {
         console.error("Error deleting website:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/**
+ * @openapi
+ * /api/templates:
+ *   get:
+ *     summary: Get all templates
+ *     tags:
+ *       - Template
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of templates
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Template'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ *   components:
+ *    schemas:
+ *      Template:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: integer
+ *            example: 1
+ *          name:
+ *            type: string
+ *            example: Template 1
+ *          config:
+ *            type: string
+ *            example: photo1Config
+ *          description:
+ *            type: string
+ *            example: Description for Template 1
+ */
+export const getAllTemplates = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized - Missing user ID" });
+        }
+
+        const templates = await prisma.template.findMany();
+
+        res.status(200).json(templates);
+    } catch (error: any) {
+        console.error("Error getting templates:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

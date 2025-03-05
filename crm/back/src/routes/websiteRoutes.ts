@@ -5,6 +5,7 @@ import {
     deleteWebsite,
     getAllWebsites,
     getWebsiteById,
+    getAllTemplates,
 } from "../controllers/websiteController";
 import authMiddleware, {
     AuthenticatedRequest,
@@ -13,6 +14,13 @@ import { Response } from "express";
 
 const router: Router = express.Router();
 
+router.get(
+    "/templates",
+    authMiddleware,
+    (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        getAllTemplates(req, res).catch(next);
+    }
+);
 router.get(
     "/",
     authMiddleware,
