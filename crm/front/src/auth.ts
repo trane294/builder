@@ -4,10 +4,10 @@ export function checkAuth(): boolean {
     return isLoggedIn;
 }
 
-export function login(): void {
+export function appLogin(): void {
     isLoggedIn = true;
 }
 
-export function logout(): void {
+export function appLogout(): void {
     isLoggedIn = false;
 }

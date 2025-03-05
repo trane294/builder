@@ -1,4 +1,24 @@
+import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
+
+const prisma = new PrismaClient();
+
+const generateJWT = (
+    userId: number,
+    firstName: string,
+    lastName: string
+): string => {
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign(
+        { userId, firstName, lastName },
+        process.env.JWT_SECRET_KEY
+    );
+
+    return token;
+};
 
 /**
  * @openapi
@@ -15,6 +35,8 @@ import { Request, Response } from "express";
  *             type: object
  *             properties:
  *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *               email:
  *                 type: string
@@ -42,7 +64,7 @@ import { Request, Response } from "express";
  *               properties:
  *                 message:
  *                   type: string
- *                   example: All fields are required.
+ *                   example: All fields are required or Passwords do not match.
  *       500:
  *         description: Internal server error
  *         content:
@@ -56,23 +78,65 @@ import { Request, Response } from "express";
  */
 export const registerUser = async (req: Request, res: Response) => {
     try {
-        const { firstName, email, password, passwordConfirm } = req.body;
+        const { firstName, lastName, email, password, passwordConfirm } =
+            req.body;
 
-        if (!firstName || !email || !password || !passwordConfirm) {
-            res.status(400).json({ message: "All fields are required." });
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !password ||
+            !passwordConfirm
+        ) {
+            res.status(400).json({
+                message: "All fields are required.",
+            });
             return;
         }
-
         if (password !== passwordConfirm) {
-            res.status(400).json({ message: "Passwords do not match." });
+            res.status(400).json({
+                message: "Passwords do not match.",
+            });
             return;
         }
 
-        res.status(201).json({ message: "User registration successful" });
+        // Hash the password (using bcrypt or similar library)
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the user using Prisma
+        const newUser = await prisma.user.create({
+            data: {
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword,
+            },
+        });
+
+        // You might want to return a subset of user data in the response
+        // to avoid exposing sensitive information like the password hash.
+        res.status(201).json({
+            message: "User registration successful",
+            userId: newUser.id,
+        });
         return;
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        // Handle unique email constraint violation
+        if (error.code === "P2002") {
+            // Prisma's unique constraint error code
+            res.status(400).json({
+                message: "Email already in use",
+            });
+            return;
+        }
+
+        console.error("Error registering user:", error);
+        res.status(500).json({
+            message: "Internal server error",
+        });
         return;
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -111,6 +175,12 @@ export const registerUser = async (req: Request, res: Response) => {
  *                 firstName:
  *                   type: string
  *                   example: FakeUserFirstName
+ *                 lastName:
+ *                   type: string
+ *                   example: FakeUserLastName
+ *                 userId:
+ *                   type: integer
+ *                   example: 1
  *       400:
  *         description: Bad request
  *         content:
@@ -120,7 +190,7 @@ export const registerUser = async (req: Request, res: Response) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Email and password are required.
+ *                   example: Invalid email or password.
  *       500:
  *         description: Internal server error
  *         content:
@@ -143,16 +213,38 @@ export const loginUser = async (req: Request, res: Response) => {
             return;
         }
 
-        const userToken = "fake-jwt-token-123";
-        res.status(200).json({
-            userToken,
+        const user = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            res.status(400).json({ message: "Invalid email or password." });
+            return;
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) {
+            res.status(400).json({ message: "Invalid email or password." });
+            return;
+        }
+
+        const token = generateJWT(user.id, user.firstName, user.lastName);
+
+        res.json({
             message: "Login successful",
-            firstName: "FakeUserFirstName",
+            userToken: token,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            userId: user.id,
         });
         return;
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        console.error("Error logging in user:", error);
+        res.status(500).json({ message: "Internal server error" });
         return;
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
@@ -174,6 +266,9 @@ export const loginUser = async (req: Request, res: Response) => {
  *                 firstName:
  *                   type: string
  *                   example: FakeUserFirstName
+ *                 lastName:
+ *                   type: string
+ *                   example: FakeUserLastName
  *       500:
  *         description: Internal server error
  *         content:
@@ -185,14 +280,44 @@ export const loginUser = async (req: Request, res: Response) => {
  *                   type: string
  *                   example: Some internal server error
  */
-export const getUserProfile = async (req: Request, res: Response) => {
+export const getUserProfile = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
     try {
-        res.status(200).json({
-            firstName: "FakeUserFirstName",
+        // The userId is now available in req.userId thanks to the middleware!
+        const userId = req.userId;
+
+        if (!userId) {
+            res.status(401).json({ message: "Unauthorized - Missing user ID" });
+            return;
+        }
+
+        // Retrieve the user's profile from the database
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+            },
         });
-        return;
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        // Return the user's profile
+        res.status(200).json({
+            userId: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+        });
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
-        return;
+        console.error("Error getting user profile:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };

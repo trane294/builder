@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { registerUser, loginUser } from './authActions';
+import { appLogin, appLogout } from 'src/auth';
 
 const userToken = localStorage.getItem('userToken')
     ? localStorage.getItem('userToken')
     : null;
+
 
 export interface CounterState {
     loading: boolean;
@@ -11,7 +13,7 @@ export interface CounterState {
     userToken: string | null;
     error: string | null;
     success: boolean;
-};
+}
 
 const initialState: CounterState = {
     loading: false,
@@ -25,6 +27,9 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        setUserDetails: (state, action: PayloadAction<object>) => {
+            state.userInfo = action;
+        },
         logout: (state) => {
             localStorage.removeItem('userToken');
             state.loading = false;
@@ -32,9 +37,10 @@ const authSlice = createSlice({
             state.userToken = null;
             state.error = null;
             state.success = false;
+            appLogout();
         },
     },
-    extraReducers: builder => {
+    extraReducers: (builder) => {
         builder
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;
@@ -44,26 +50,36 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.success = true;
             })
-            .addCase(registerUser.rejected, (state, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || null;
-            })
+            .addCase(
+                registerUser.rejected,
+                (state, action: PayloadAction<string | undefined>) => {
+                    state.loading = false;
+                    state.error = action.payload || null;
+                }
+            )
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             // TODO: fix any
-            .addCase(loginUser.fulfilled, (state, { payload }: { payload: any }) => {
-                state.loading = false;
-                state.userInfo = payload;
-                state.userToken = payload && payload.userToken;
-            })
-            .addCase(loginUser.rejected, (state, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || null;
-            });
+            .addCase(
+                loginUser.fulfilled,
+                (state, { payload }: { payload: any }) => {
+                    state.loading = false;
+                    state.userInfo = payload;
+                    state.userToken = payload && payload.userToken;
+                    appLogin();
+                }
+            )
+            .addCase(
+                loginUser.rejected,
+                (state, action: PayloadAction<string | undefined>) => {
+                    state.loading = false;
+                    state.error = action.payload || null;
+                }
+            );
     },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setUserDetails } = authSlice.actions;
 export default authSlice.reducer;

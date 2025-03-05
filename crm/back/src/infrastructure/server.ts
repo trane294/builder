@@ -1,23 +1,22 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import helmet from "helmet";
 import userRoutes from "../routes/userRoutes";
-import swaggerDocs from "./swagger";
-import logger from "./winston";
+import cors from 'cors';
 
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const allowedOrigins = ["http://localhost:5173"];
+
+const options: cors.CorsOptions = {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+};
+
 app.use(helmet());
-app.use(
-    cors({
-        origin: ["*"],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
-);
+app.use(cors(options));
 
 app.use(cookieParser());
 app.use(express.json());
