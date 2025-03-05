@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router';
 import { Puck, Config } from '@measured/puck';
 import '@measured/puck/puck.css';
-import { photo1Config } from 'src/templates/photo-1/config';
 import {
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
 import { message } from 'antd';
-import { ICreateWebsite, IWebsite } from 'src/types';
+import { IWebsite } from 'src/types';
+import { templatesLibrary } from 'src/templates/template';
 
 type EditorPageProps = {};
 
@@ -50,7 +50,8 @@ export default function EditorPage(props: EditorPageProps) {
     useEffect(() => {
         if (!website) return;
 
-        setConfig(photo1Config);
+        const templateConfig = templatesLibrary[website.template.config];
+        setConfig(templateConfig);
     }, [website, websiteId]);
 
     if (isErrorWebsite) {
