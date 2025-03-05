@@ -13,6 +13,7 @@ import { useAppDispatch } from 'src/hooks';
 import { useGetUserDetailsQuery } from 'src/services/auth/authService';
 import { setUserDetails } from 'src/features/auth/authSlice';
 import { useEffect } from 'react';
+import CreateWebsiteModal from './modals/CreateWebsiteModal';
 
 const App = () => {
     const dispatch = useAppDispatch();
@@ -20,9 +21,9 @@ const App = () => {
 
     useEffect(() => {
         if (user) {
-            dispatch(setUserDetails(user)); // Update the Redux store with user details
+            dispatch(setUserDetails(user));
         }
-    }, [user, dispatch]); // Depend on user data and dispatch
+    }, [user, dispatch]);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -54,6 +55,7 @@ const App = () => {
                     </Route>
                 </Route>
             </Routes>
+            <CreateWebsiteModal />
         </>
     );
 };

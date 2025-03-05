@@ -100,11 +100,97 @@ export const getAllWebsites = async (
                     },
                 },
             },
+            where: { userId: userId },
         });
 
         res.status(200).json(websites);
     } catch (error: any) {
         console.error("Error getting websites:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/**
+ * @openapi
+ * /api/website/{id}:
+ *   get:
+ *     summary: Get a website by ID for authenticated user
+ *     tags:
+ *       - Website
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Website ID
+ *     responses:
+ *       200:
+ *         description: Website found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Website'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Website not found
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+export const getWebsiteById = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!userId) {
+            return res
+                .status(401)
+                .json({ message: "Unauthorized - Missing user ID" });
+        }
+
+        const websiteId = parseInt(id, 10);
+
+        const website = await prisma.website.findUnique({
+            where: { id: websiteId, userId: userId },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                templateId: true,
+                userId: true,
+                createdAt: true,
+                updatedAt: true,
+                data: true,
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                    },
+                },
+            },
+        });
+
+        if (!website) {
+            return res.status(400).json({ message: "Website not found" });
+        }
+
+        res.status(200).json(website);
+    } catch (error: any) {
+        console.error("Error getting website by ID:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };

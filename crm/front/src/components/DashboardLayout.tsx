@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Col, Dropdown, Layout, Menu, Row, theme } from 'antd';
-import { Outlet } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import AvatarImg from 'src/assets/images/avatar.svg';
 import { logout } from 'src/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
@@ -78,7 +78,9 @@ const DashboardLayout = () => {
                             paddingInline: 24,
                         }}
                     >
-                        <Col flex={2}>Logo Project</Col>
+                        <Col flex={2}>
+                            <Link to="/">Logo Project</Link>
+                        </Col>
                         <Col style={{ textAlign: 'right', marginLeft: 25 }}>
                             Welcome John Cena
                         </Col>

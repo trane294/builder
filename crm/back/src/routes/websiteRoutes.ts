@@ -4,6 +4,7 @@ import {
     updateWebsite,
     deleteWebsite,
     getAllWebsites,
+    getWebsiteById,
 } from "../controllers/websiteController";
 import authMiddleware, {
     AuthenticatedRequest,
@@ -17,6 +18,13 @@ router.get(
     authMiddleware,
     (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         getAllWebsites(req, res).catch(next);
+    }
+);
+router.get(
+    "/:id",
+    authMiddleware,
+    (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        getWebsiteById(req, res).catch(next);
     }
 );
 router.post(

@@ -1,22 +1,44 @@
-import { Button } from "antd";
-import { NavLink } from "react-router";
+import { Button } from 'antd';
+import { Navigate, NavLink, useParams } from 'react-router';
+import { useGetWebsiteByIdQuery } from 'src/services/website/websiteService';
 
 function ProjectPage() {
+    const { id } = useParams();
+
+    if (!id) {
+        return <Navigate to="/" replace />;
+    }
+
+    const {
+        data: website,
+        isLoading,
+        isError,
+        error,
+    } = useGetWebsiteByIdQuery(id);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!website) {
+        return <div>Error</div>;
+    }
+
     return (
         <>
             <div>
                 <div>
-                    Project
+                    Website: {website.name}
+                    <br />
+                    <br />
                 </div>
 
-                <NavLink to="/editor/1">
-                    <Button htmlType="button">
-                        Edit
-                    </Button>
+                <NavLink to={`/editor/${website.id}`}>
+                    <Button htmlType="button">Edit</Button>
                 </NavLink>
             </div>
         </>
-    )
+    );
 }
 
 export default ProjectPage;

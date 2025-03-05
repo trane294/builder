@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { registerUser, loginUser } from './authActions';
 import { appLogin, appLogout } from 'src/auth';
+import { IUser } from 'src/types';
 
 const userToken = localStorage.getItem('userToken')
     ? localStorage.getItem('userToken')
@@ -9,7 +10,7 @@ const userToken = localStorage.getItem('userToken')
 
 export interface CounterState {
     loading: boolean;
-    userInfo: object | null;
+    userInfo: IUser | null;
     userToken: string | null;
     error: string | null;
     success: boolean;
@@ -27,8 +28,8 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUserDetails: (state, action: PayloadAction<object>) => {
-            state.userInfo = action;
+        setUserDetails: (state, action: PayloadAction<IUser>) => {
+            state.userInfo = action.payload;
         },
         logout: (state) => {
             localStorage.removeItem('userToken');

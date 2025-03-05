@@ -115,7 +115,7 @@ export const registerUser = async (req: Request, res: Response) => {
         // to avoid exposing sensitive information like the password hash.
         return res.status(201).json({
             message: "User registration successful",
-            userId: newUser.id,
+            id: newUser.id,
         });
     } catch (error: any) {
         // Handle unique email constraint violation
@@ -232,7 +232,7 @@ export const loginUser = async (req: Request, res: Response) => {
             userToken: token,
             firstName: user.firstName,
             lastName: user.lastName,
-            userId: user.id,
+            id: user.id,
         });
     } catch (error: any) {
         console.error("Error logging in user:", error);
@@ -305,7 +305,7 @@ export const getUserProfile = async (
 
         // Return the user's profile
         res.status(200).json({
-            userId: user.id,
+            id: user.id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,

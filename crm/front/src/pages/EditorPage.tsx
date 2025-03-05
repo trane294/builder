@@ -1,60 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 import { Puck, Config } from '@measured/puck';
 import '@measured/puck/puck.css';
 import { photo1Config } from 'src/templates/photo-1/config';
+import {
+    useGetWebsiteByIdQuery,
+    useUpdateWebsiteMutation,
+} from 'src/services/website/websiteService';
+import { message } from 'antd';
+import { ICreateWebsite, IWebsite } from 'src/types';
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
-    const { id: templateId } = useParams<{ id: string }>();
-    const params = useParams();
-    const [config, setConfig] = useState<Config<any, any> | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { id: websiteId } = useParams();
 
-    // Example: some initial data
-    const [initialData] = useState<Record<string, any>>({});
-
-    // A function to handle Puck's onPublish
-    const save = (data: Record<string, any>) => {
-        console.log('onPublish data:', data);
-        // Could POST to your server to store the data
-    };
-
-    // Fetch config from your API whenever templateId changes
-    useEffect(() => {
-        // if (!templateId) return;
-
-        // setLoading(true);
-        // setError(null);
-
-        // fetch(`http://localhost:4000/api/templates/${templateId}`)
-        //     .then((res) => {
-        //         if (!res.ok) {
-        //             throw new Error(`Failed to fetch config: ${res.status}`);
-        //         }
-        //         return res.json();
-        //     })
-        //     .then((fetchedConfig) => {
-        //         setConfig(fetchedConfig);
-        //         setLoading(false);
-        //     })
-        //     .catch((err) => {
-        //         console.error(err);
-        //         setError(err.message);
-        //         setLoading(false);
-        //     });
-
-        setConfig(photo1Config);
-        setLoading(false);
-    }, [templateId]);
-
-    if (!templateId) {
-        return <div>No template id provided.</div>;
+    if (!websiteId) {
+        return <Navigate to="/" replace />;
     }
 
-    if (loading) {
+    const {
+        data: website,
+        isLoading: isLoadingWebsite,
+        isError: isErrorWebsite,
+        error: errorWebsite,
+    } = useGetWebsiteByIdQuery(websiteId);
+
+    const [
+        updateWebsite,
+        { isLoading: isUpdating, isError, error: errorUpdate },
+    ] = useUpdateWebsiteMutation();
+    const [config, setConfig] = useState<Config<any, any> | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [initialData] = useState<Record<string, any>>({});
+
+    const save = async (data: object) => {
+        console.log('onPublish data:', data);
+        try {
+            let _website = { ...website };
+            _website.data = data;
+            await updateWebsite(_website as IWebsite);
+            message.success('Website updated successfully!');
+        } catch (err: any) {
+            message.error(
+                `Failed to update website: ${err.data?.message || err.message}`
+            );
+            console.error('Error updating website:', err);
+        }
+    };
+
+    useEffect(() => {
+        if (!website) return;
+
+        setConfig(photo1Config);
+    }, [website, websiteId]);
+
+    if (isLoadingWebsite) {
+        return <div>Loading website data...</div>;
+    }
+
+    if (isErrorWebsite) {
+        return (
+            <div>
+                Error loading website:{' '}
+                {errorWebsite && 'Unknown error'}
+            </div>
+        );
+    }
+
+    if (!website) {
+        return <Navigate to="/" replace />;
+    }
+
+    if (isLoadingWebsite) {
         return <div>Loading template config...</div>;
     }
 
@@ -66,5 +84,5 @@ export default function EditorPage(props: EditorPageProps) {
         return <div>No config found.</div>;
     }
 
-    return <Puck config={config} data={initialData} onPublish={save} />;
+    return <Puck config={config} data={website.data || {}} onPublish={save} />;
 }
