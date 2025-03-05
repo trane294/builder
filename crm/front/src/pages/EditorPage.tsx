@@ -31,8 +31,6 @@ export default function EditorPage(props: EditorPageProps) {
         { isLoading: isUpdating, isError, error: errorUpdate },
     ] = useUpdateWebsiteMutation();
     const [config, setConfig] = useState<Config<any, any> | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [initialData] = useState<Record<string, any>>({});
 
     const save = async (data: object) => {
         console.log('onPublish data:', data);
@@ -55,10 +53,6 @@ export default function EditorPage(props: EditorPageProps) {
         setConfig(photo1Config);
     }, [website, websiteId]);
 
-    if (isLoadingWebsite) {
-        return <div>Loading website data...</div>;
-    }
-
     if (isErrorWebsite) {
         return (
             <div>
@@ -68,16 +62,8 @@ export default function EditorPage(props: EditorPageProps) {
         );
     }
 
-    if (!website) {
-        return <Navigate to="/" replace />;
-    }
-
-    if (isLoadingWebsite) {
-        return <div>Loading template config...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
+    if (!website || isLoadingWebsite) {
+        return <div>Loading website config...</div>;
     }
 
     if (!config) {
