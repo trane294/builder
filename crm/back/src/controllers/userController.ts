@@ -88,16 +88,14 @@ export const registerUser = async (req: Request, res: Response) => {
             !password ||
             !passwordConfirm
         ) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "All fields are required.",
             });
-            return;
         }
         if (password !== passwordConfirm) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Passwords do not match.",
             });
-            return;
         }
 
         // Hash the password (using bcrypt or similar library)
@@ -115,26 +113,23 @@ export const registerUser = async (req: Request, res: Response) => {
 
         // You might want to return a subset of user data in the response
         // to avoid exposing sensitive information like the password hash.
-        res.status(201).json({
+        return res.status(201).json({
             message: "User registration successful",
             userId: newUser.id,
         });
-        return;
     } catch (error: any) {
         // Handle unique email constraint violation
         if (error.code === "P2002") {
             // Prisma's unique constraint error code
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Email already in use",
             });
-            return;
         }
 
         console.error("Error registering user:", error);
         res.status(500).json({
             message: "Internal server error",
         });
-        return;
     } finally {
         await prisma.$disconnect();
     }
@@ -207,10 +202,9 @@ export const loginUser = async (req: Request, res: Response) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Email and password are required.",
             });
-            return;
         }
 
         const user = await prisma.user.findUnique({
@@ -218,31 +212,31 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            res.status(400).json({ message: "Invalid email or password." });
-            return;
+            return res
+                .status(400)
+                .json({ message: "Invalid email or password." });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            res.status(400).json({ message: "Invalid email or password." });
-            return;
+            return res
+                .status(400)
+                .json({ message: "Invalid email or password." });
         }
 
         const token = generateJWT(user.id, user.firstName, user.lastName);
 
-        res.json({
+        return res.json({
             message: "Login successful",
             userToken: token,
             firstName: user.firstName,
             lastName: user.lastName,
             userId: user.id,
         });
-        return;
     } catch (error: any) {
         console.error("Error logging in user:", error);
         res.status(500).json({ message: "Internal server error" });
-        return;
     } finally {
         await prisma.$disconnect();
     }
@@ -289,8 +283,9 @@ export const getUserProfile = async (
         const userId = req.userId;
 
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized - Missing user ID" });
-            return;
+            return res
+                .status(401)
+                .json({ message: "Unauthorized - Missing user ID" });
         }
 
         // Retrieve the user's profile from the database
@@ -305,8 +300,7 @@ export const getUserProfile = async (
         });
 
         if (!user) {
-            res.status(404).json({ message: "User not found" });
-            return;
+            return res.status(404).json({ message: "User not found" });
         }
 
         // Return the user's profile

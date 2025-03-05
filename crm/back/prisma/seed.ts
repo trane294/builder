@@ -1,12 +1,15 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
-import { users, customers, invoices, revenue, projects } from './placeholder-data';
+import {
+    users,
+    templates,
+} from "./placeholder-data";
 
 const prisma = new PrismaClient();
 
 async function main() {
-    // 1. Seed Users
+    // 1. Seed users
     for (const user of users) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         await prisma.user.upsert({
@@ -19,6 +22,31 @@ async function main() {
                 password: hashedPassword,
             },
         });
+    }
+    // 2. Seed templates
+    for (const template of templates) {
+        const existingTemplate = await prisma.template.findFirst({
+            where: { name: template.name },
+        });
+
+        if (existingTemplate) {
+            await prisma.template.update({
+                where: { id: existingTemplate.id },
+                data: {
+                    name: template.name,
+                    config: template.config,
+                    description: template.description,
+                },
+            });
+        } else {
+            await prisma.template.create({
+                data: {
+                    name: template.name,
+                    config: template.config,
+                    description: template.description,
+                },
+            });
+        }
     }
 
     // // 2. Seed Customers
@@ -78,11 +106,11 @@ async function main() {
 
 main()
     .then(async () => {
-        console.log('✅ Database seeded successfully!');
+        console.log("✅ Database seeded successfully!");
         await prisma.$disconnect();
     })
     .catch(async (e) => {
-        console.error('Error seeding database: ', e);
+        console.error("Error seeding database: ", e);
         await prisma.$disconnect();
         process.exit(1);
     });

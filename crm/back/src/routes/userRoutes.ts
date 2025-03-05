@@ -1,15 +1,27 @@
-import express, { Router } from "express";
+import express, { Request, Response, Router, NextFunction } from "express";
 import {
     registerUser,
     loginUser,
     getUserProfile,
 } from "../controllers/userController";
-import authMiddleware from "../middleware/authMiddleware";
+import authMiddleware, {
+    AuthenticatedRequest,
+} from "../middleware/authMiddleware";
 
 const router: Router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/profile", authMiddleware, getUserProfile);
+router.post("/register", (req: Request, res: Response, next: NextFunction) => {
+    registerUser(req, res).catch(next);
+});
+router.post("/login", (req: Request, res: Response, next: NextFunction) => {
+    loginUser(req, res).catch(next);
+});
+router.get(
+    "/profile",
+    authMiddleware,
+    (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        getUserProfile(req, res).catch(next);
+    }
+);
 
 export default router;

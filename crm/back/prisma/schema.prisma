@@ -36,7 +36,7 @@ datasource db {
 // }
 
 model User {
-    id        Int    @id @default(autoincrement())
+    id        Int       @id @default(autoincrement())
     firstName String
     lastName  String
     email     String    @unique
@@ -45,17 +45,30 @@ model User {
     createdAt DateTime  @default(now()) @db.Timestamptz(6)
     updatedAt DateTime? @updatedAt @db.Timestamptz(6)
     deletedAt DateTime? @db.Timestamptz(6)
-    // projects  Project[]
+    websites  Website[]
 }
 
-// model Project {
-//     id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-//     name        String    @db.VarChar(255)
-//     description String?
-//     template    Json?
-//     user_id     String    @db.Uuid
-//     user        User      @relation(fields: [user_id], references: [id])
-//     createdAt   DateTime  @default(now()) @db.Timestamptz(6)
-//     updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
-//     deletedAt   DateTime? @db.Timestamptz(6)
-// }
+model Template {
+    id          Int       @id @default(autoincrement())
+    config      String    @db.VarChar(255)
+    name        String    @db.VarChar(255)
+    description String?
+    createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+    deletedAt   DateTime? @db.Timestamptz(6)
+    Website     Website[]
+}
+
+model Website {
+    id          Int       @id @default(autoincrement())
+    name        String    @db.VarChar(255)
+    description String?
+    templateId Int
+    template    Template  @relation(fields: [templateId], references: [id])
+    userId     Int
+    user        User      @relation(fields: [userId], references: [id])
+    data        Json?
+    createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+    deletedAt   DateTime? @db.Timestamptz(6)
+}

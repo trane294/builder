@@ -2,6 +2,8 @@
 
 This document outlines common Prisma commands and their usage, based on the official Prisma documentation: [https://www.prisma.io/docs/orm/prisma-migrate/getting-started](https://www.prisma.io/docs/orm/prisma-migrate/getting-started)
 
+Dev only: npx prisma migrate dev --name init (will make first migration)
+
 ## 1. Setup and Initialization
 
 *   **`npx prisma init`**
