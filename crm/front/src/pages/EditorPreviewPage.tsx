@@ -27,9 +27,7 @@ export default function EditorPreviewPage() {
 
         const templateConfig = templatesLibrary[website.template.config];
         const config = templateConfig(userInfo?.firstName);
-        console.log(config);
-
-        setConfig(templateConfig(userInfo?.firstName));
+        setConfig(config);
     }, [website, websiteId, userInfo]);
 
     if (!website || isLoadingWebsite) {

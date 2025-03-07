@@ -3,7 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { DateTime } from 'luxon';
 import { RootState } from 'src/store';
 import { closeModal } from 'src/features/modal/modalSlice';
-import { Modal as AntModal, Button, Card, Row, Col } from 'antd';
+import {
+    Modal as AntModal,
+    Card,
+    Row,
+    Col,
+    Button,
+    Flex,
+    Space,
+    message,
+} from 'antd';
 import {
     useCreateWebsiteMutation,
     useGetWebsitesQuery,
@@ -19,14 +28,15 @@ const activeCardStyle = {
 
 const CreateWebsiteModal: React.FC = () => {
     const dispatch = useDispatch();
-    const { isOpen, componentName, props } = useSelector(
-        (state: RootState) => state.modal
-    );
+    const { isOpen, props } = useSelector((state: RootState) => state.modal);
     const { userInfo } = useAppSelector((state) => state.auth);
+
+    if (!userInfo) return null;
+
     const [selectedTemplate, setSelectedTemplate] = useState<ITemplate | null>(
         null
     );
-    const [createWebsite, { isLoading, isError, error }] =
+    const [createWebsite, { isLoading: isLoadingC, isError, error }] =
         useCreateWebsiteMutation();
     const {
         data: templates,
@@ -35,8 +45,6 @@ const CreateWebsiteModal: React.FC = () => {
         error: errorT,
     } = useGetWebsiteTemplatesQuery();
     const { refetch: refetchWebsites } = useGetWebsitesQuery();
-
-    if (!userInfo) return null;
 
     const handleTemplateSelect = (template: ITemplate) => {
         setSelectedTemplate(template);
@@ -52,6 +60,8 @@ const CreateWebsiteModal: React.FC = () => {
                     templateId: selectedTemplate.id,
                     userId: userInfo.id,
                 });
+
+                message.success('Website created');
                 dispatch(closeModal());
                 refetchWebsites();
             } catch (err: any) {
@@ -59,9 +69,10 @@ const CreateWebsiteModal: React.FC = () => {
                     'Error creating website:',
                     err.data?.message || err.message
                 );
+                message.error('Error creating website');
             }
         } else {
-            console.error('Please select a template');
+            message.info('Please select template');
         }
     };
 
@@ -75,15 +86,13 @@ const CreateWebsiteModal: React.FC = () => {
             open={isOpen}
             onCancel={() => dispatch(closeModal())}
             footer={[
-                <Button key="back" onClick={() => dispatch(closeModal())}>
-                    Cancel
-                </Button>,
+                <Button onClick={() => dispatch(closeModal())}>Cancel</Button>,
                 <Button
-                    key="submit"
                     type="primary"
+                    loading={isLoadingC}
                     onClick={handleCreateWebsite}
                 >
-                    Create
+                    Save
                 </Button>,
             ]}
         >

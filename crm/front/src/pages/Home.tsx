@@ -4,7 +4,7 @@ import { decrement, increment } from 'src/features/counter/counterSlice';
 import { NavLink } from 'react-router';
 import { useGetWebsitesQuery } from 'src/services/website/websiteService';
 import { IWebsite } from 'src/types';
-import CreateWebsiteModal from 'src/modals/CreateWebsiteModal';
+import EntryModal from 'src/modals/EntryModal';
 import { openModal } from 'src/features/modal/modalSlice';
 import { Button } from 'antd';
 
@@ -33,7 +33,7 @@ function Home() {
                 {projects &&
                     projects.map((project: IWebsite, key: number) => (
                         <div key={key}>
-                            <NavLink to={`/project/${project.id}`}>
+                            <NavLink to={`/editor/${project.id}`}>
                                 {project.name}
                             </NavLink>
                         </div>

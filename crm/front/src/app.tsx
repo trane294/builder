@@ -13,7 +13,7 @@ import { useAppDispatch } from 'src/hooks';
 import { useGetUserDetailsQuery } from 'src/services/auth/authService';
 import { setUserDetails } from 'src/features/auth/authSlice';
 import { useEffect } from 'react';
-import CreateWebsiteModal from './modals/CreateWebsiteModal';
+import EntryModal from './modals/EntryModal';
 
 const App = () => {
     const dispatch = useAppDispatch();
@@ -55,7 +55,8 @@ const App = () => {
                     </Route>
                 </Route>
             </Routes>
-            <CreateWebsiteModal />
+            <EntryModal />
+            {/* <WebsiteSettingsModal /> */}
         </>
     );
 };

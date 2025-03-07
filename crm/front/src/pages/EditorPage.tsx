@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate, useParams } from 'react-router';
-import { Puck, Config } from '@measured/puck';
+import React, { Children, useEffect, useState } from 'react';
+import { Link, Navigate, useParams } from 'react-router';
+import { Puck, Config, usePuck } from '@measured/puck';
 import '@measured/puck/puck.css';
 import {
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
-import { message } from 'antd';
+import { Button, message } from 'antd';
 import { IWebsite } from 'src/types';
 import { templatesLibrary } from 'src/templates/template';
 import { useAppSelector } from 'src/hooks';
+import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
+import { openModal } from 'src/features/modal/modalSlice';
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
+    const dispatch = useDispatch();
     const { id: websiteId } = useParams();
     const { userInfo } = useAppSelector((state) => state.auth);
 
@@ -53,21 +57,18 @@ export default function EditorPage(props: EditorPageProps) {
         if (!website) return;
         if (!userInfo) return;
 
-        // const templateConfig = templatesLibrary[website.template.config];
-        // setConfig(templateConfig);
         const templateConfig = templatesLibrary[website.template.config];
         const config = templateConfig(userInfo?.firstName);
-        console.log(config);
-
-        setConfig(templateConfig(userInfo?.firstName));
+        setConfig(config);
     }, [website, websiteId, userInfo]);
+
+    const handleSettings = () => {
+        dispatch(openModal({ componentName: 'WebsiteSettingsModal', props: { website } }));
+    };
 
     if (isErrorWebsite) {
         return (
-            <div>
-                Error loading website:{' '}
-                {errorWebsite && 'Unknown error'}
-            </div>
+            <div>Error loading website: {errorWebsite && 'Unknown error'}</div>
         );
     }
 
@@ -79,5 +80,44 @@ export default function EditorPage(props: EditorPageProps) {
         return <div>No config found.</div>;
     }
 
-    return <Puck config={config} data={website.data || {}} onPublish={save} />;
+    return (
+        <Puck
+            config={config}
+            data={website.data || {}}
+            onPublish={save}
+            overrides={{
+                headerActions: ({ children }) => {
+                    const { appState } = usePuck();
+
+                    return (
+                        <>
+                            <Link to="/">
+                                <Button
+                                    type="default"
+                                    icon={<HomeOutlined />}
+                                    size={'middle'}
+                                />
+                            </Link>
+                            <Button
+                                type="primary"
+                                size={'middle'}
+                                loading={isUpdating}
+                                onClick={() => {
+                                    save(appState.data);
+                                }}
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                type="default"
+                                icon={<SettingOutlined />}
+                                size={'middle'}
+                                onClick={() => handleSettings()}
+                            />
+                        </>
+                    );
+                },
+            }}
+        />
+    );
 }
