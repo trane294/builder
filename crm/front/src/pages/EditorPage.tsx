@@ -9,11 +9,13 @@ import {
 import { message } from 'antd';
 import { IWebsite } from 'src/types';
 import { templatesLibrary } from 'src/templates/template';
+import { useAppSelector } from 'src/hooks';
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
     const { id: websiteId } = useParams();
+    const { userInfo } = useAppSelector((state) => state.auth);
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -49,10 +51,16 @@ export default function EditorPage(props: EditorPageProps) {
 
     useEffect(() => {
         if (!website) return;
+        if (!userInfo) return;
 
+        // const templateConfig = templatesLibrary[website.template.config];
+        // setConfig(templateConfig);
         const templateConfig = templatesLibrary[website.template.config];
-        setConfig(templateConfig);
-    }, [website, websiteId]);
+        const config = templateConfig(userInfo?.firstName);
+        console.log(config);
+
+        setConfig(templateConfig(userInfo?.firstName));
+    }, [website, websiteId, userInfo]);
 
     if (isErrorWebsite) {
         return (

@@ -1,13 +1,15 @@
 import { Config } from '@measured/puck';
+import { useAppSelector } from 'src/hooks';
 import FooterPhoto1 from 'src/templates/photo-1/footer';
 import HeroPhoto1 from 'src/templates/photo-1/hero';
 import LayoutPhoto1 from 'src/templates/photo-1/layout';
 import MenuPhoto1 from 'src/templates/photo-1/menu';
 import SectionPhoto1 from 'src/templates/photo-1/section';
 
-type Components = {
+export type Components = {
     HeroPhoto1: {
-        children: string;
+        title: string;
+        name: string;
     };
     MenuPhoto1: {
         children: string;
@@ -24,18 +26,27 @@ type RootProps = {
     title: string;
 };
 
-export const photo1Config: Config<Components, RootProps> = {
+export const photo1Config = (username: string): Config<Components, RootProps> => ({
     components: {
         HeroPhoto1: {
             fields: {
-                children: {
+                title: {
                     type: 'text',
+                    label: 'Title',
+                },
+                name: {
+                    type: 'text',
+                    label: 'Full Name',
                 },
             },
-            render: ({ children }) => {
+            defaultProps: {
+                title: 'Demo Store',
+                name: username || 'John Smith',
+            },
+            render: ({ title, name }) => {
                 return (
                     <>
-                        <HeroPhoto1></HeroPhoto1>
+                        <HeroPhoto1 title={title} name={name}></HeroPhoto1>
                     </>
                 );
             },
@@ -97,4 +108,4 @@ export const photo1Config: Config<Components, RootProps> = {
             );
         },
     },
-};
+});

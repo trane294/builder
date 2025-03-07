@@ -2,7 +2,7 @@ import { Config } from '@measured/puck';
 import { photo1Config } from 'src/templates/photo-1/config';
 
 export interface TemplatesLibrary {
-    [index: string]: Config<any, any>;
+    [index: string]: (username: string) => Config<any, any>;
 }
 
 export const templatesLibrary: TemplatesLibrary = {

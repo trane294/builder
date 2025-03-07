@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
+import { Components } from './config';
 
-const HeroPhoto1: React.FC = () => {
+export type IHeroPhoto1 = {
+    title: string;
+    name: string;
+};
+
+const HeroPhoto1: React.FC<IHeroPhoto1> = ({ title, name }) => {
     return (
         <div
             id="hero"
@@ -13,9 +19,9 @@ const HeroPhoto1: React.FC = () => {
             <div className="absolute inset-0 bg-black/50"></div>
 
             <div className="relative text-center">
-                <h1 className="text-6xl mb-4">Prograin</h1>
+                <h1 className="text-6xl mb-4">{title}</h1>
                 <p className="text-lg">
-                    Максим Тонких |{' '}
+                    {name} |{' '}
                     <a href="https://mxtkh.ru" className="underline">
                         mxtkh.ru
                     </a>
