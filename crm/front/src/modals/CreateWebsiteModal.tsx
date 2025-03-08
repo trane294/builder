@@ -86,8 +86,11 @@ const CreateWebsiteModal: React.FC = () => {
             open={isOpen}
             onCancel={() => dispatch(closeModal())}
             footer={[
-                <Button onClick={() => dispatch(closeModal())}>Cancel</Button>,
+                <Button key="back" onClick={() => dispatch(closeModal())}>
+                    Cancel
+                </Button>,
                 <Button
+                    key="submit"
                     type="primary"
                     loading={isLoadingC}
                     onClick={handleCreateWebsite}

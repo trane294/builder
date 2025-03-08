@@ -3,6 +3,8 @@ import {
     AppstoreOutlined,
     BarChartOutlined,
     CloudOutlined,
+    HomeOutlined,
+    SettingOutlined,
     ShopOutlined,
     TeamOutlined,
     UploadOutlined,
@@ -11,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Col, Dropdown, Layout, Menu, Row, theme } from 'antd';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import AvatarImg from 'src/assets/images/avatar.svg';
 import { logout } from 'src/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
@@ -30,26 +32,55 @@ const siderStyle: React.CSSProperties = {
     scrollbarGutter: 'stable',
 };
 
-const items: MenuProps['items'] = [
-    UserOutlined,
-    VideoCameraOutlined,
-    UploadOutlined,
-    BarChartOutlined,
-    CloudOutlined,
-    AppstoreOutlined,
-    TeamOutlined,
-    ShopOutlined,
-].map((icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: `nav ${index + 1}`,
-}));
+// const items: MenuProps['items'] = [
+//     UserOutlined,
+//     VideoCameraOutlined,
+//     UploadOutlined,
+//     BarChartOutlined,
+//     CloudOutlined,
+//     AppstoreOutlined,
+//     TeamOutlined,
+//     ShopOutlined,
+// ].map((icon, index) => ({
+//     key: String(index + 1),
+//     icon: React.createElement(icon),
+//     label: `nav ${index + 1}`,
+// }));
 
 const DashboardLayout = () => {
     const dispatch = useDispatch<AppDispatch>();
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const items: MenuProps['items'] = [
+        {
+            key: 'home',
+            icon: <HomeOutlined />,
+            label: `Home`,
+            onClick: () => navigate('/'),
+        },
+        {
+            key: 'settings',
+            icon: <SettingOutlined />,
+            label: `Settings`,
+            onClick: () => navigate('/settings'),
+        },
+    ];
+
+    const getSelectedKey = () => {
+        const path = location.pathname;
+
+        if (path === '/' || path === '') {
+            return ['home'];
+        } else if (path.includes('/settings')) {
+            return ['settings'];
+        }
+
+        return ['home'];
+    };
 
     const dropdownItems: MenuProps['items'] = [
         {
@@ -66,7 +97,7 @@ const DashboardLayout = () => {
                 <Menu
                     theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={['4']}
+                    selectedKeys={getSelectedKey()}
                     items={items}
                 />
             </Sider>

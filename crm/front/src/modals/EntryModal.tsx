@@ -23,16 +23,7 @@ const EntryModal: React.FC = () => {
 
     const Modal = Modals[componentName];
 
-    return (
-        <AntModal
-            title="Create Website"
-            open={isOpen}
-            onCancel={() => dispatch(closeModal())}
-            footer={[]}
-        >
-            <Modal />
-        </AntModal>
-    );
+    return <Modal />;
 };
 
 export default EntryModal;

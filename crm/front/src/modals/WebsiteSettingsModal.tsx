@@ -2,9 +2,19 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/store';
 import { closeModal } from 'src/features/modal/modalSlice';
-import { Modal as AntModal, Button, Form, FormProps, Input, message } from 'antd';
+import {
+    Modal as AntModal,
+    Button,
+    Form,
+    FormProps,
+    Input,
+    message,
+} from 'antd';
 import { useAppSelector } from 'src/hooks';
-import { useGetWebsiteByIdQuery, useUpdateWebsiteMutation } from 'src/services/website/websiteService';
+import {
+    useGetWebsiteByIdQuery,
+    useUpdateWebsiteMutation,
+} from 'src/services/website/websiteService';
 import { Config } from '@measured/puck';
 import { useParams } from 'react-router';
 import { IWebsite } from 'src/types';
@@ -50,11 +60,13 @@ const WebsiteSettingsModal: React.FC = () => {
             open={isOpen}
             onCancel={() => dispatch(closeModal())}
             footer={[
-                <Button onClick={() => dispatch(closeModal())}>Cancel</Button>,
+                <Button key="back" onClick={() => dispatch(closeModal())}>
+                    Cancel
+                </Button>,
                 <Button
+                    key="submit"
                     type="primary"
                     form="myForm"
-                    key="submit"
                     htmlType="submit"
                     loading={isLoading}
                 >
