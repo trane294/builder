@@ -100,7 +100,7 @@ export const getAllWebsites = async (
                     },
                 },
             },
-            where: { userId: userId },
+            where: { userId: userId, deletedAt: null },
         });
 
         res.status(200).json(websites);
@@ -165,7 +165,7 @@ export const getWebsiteById = async (
         const websiteId = parseInt(id, 10);
 
         const website = await prisma.website.findUnique({
-            where: { id: websiteId, userId: userId },
+            where: { id: websiteId, userId: userId, deletedAt: null },
             select: {
                 id: true,
                 name: true,
@@ -506,15 +506,18 @@ export const deleteWebsite = async (
         const websiteId = parseInt(id, 10);
 
         const existingWebsite = await prisma.website.findUnique({
-            where: { id: websiteId },
+            where: { id: websiteId, deletedAt: null },
         });
 
         if (!existingWebsite) {
             return res.status(400).json({ message: "Website not found" });
         }
 
-        await prisma.website.delete({
+        await prisma.website.update({
             where: { id: websiteId },
+            data: {
+                deletedAt: new Date(),
+            },
         });
 
         res.status(200).json({ message: "Website deleted successfully" });

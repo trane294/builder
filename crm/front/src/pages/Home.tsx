@@ -6,7 +6,7 @@ import { useGetWebsitesQuery } from 'src/services/website/websiteService';
 import { IWebsite } from 'src/types';
 import EntryModal from 'src/modals/EntryModal';
 import { openModal } from 'src/features/modal/modalSlice';
-import { Button } from 'antd';
+import { Button, List } from 'antd';
 
 function Home() {
     const dispatch = useDispatch();
@@ -30,14 +30,28 @@ function Home() {
                 <br />
             </div>
             <div>
-                {projects &&
-                    projects.map((project: IWebsite, key: number) => (
-                        <div key={key}>
-                            <NavLink to={`/editor/${project.id}`}>
-                                {project.name}
-                            </NavLink>
-                        </div>
-                    ))}
+                {projects && (
+                    <List
+                        dataSource={projects}
+                        renderItem={(project: IWebsite, key: number) => (
+                            <List.Item
+                                key={key}
+                                actions={[
+                                    <NavLink
+                                        to={`/editor/${project.id}`}
+                                        key="edit-link"
+                                    >
+                                        Edit
+                                    </NavLink>,
+                                ]}
+                            >
+                                <NavLink to={`/editor/${project.id}`}>
+                                    {project.name}
+                                </NavLink>
+                            </List.Item>
+                        )}
+                    />
+                )}
             </div>
         </>
     );

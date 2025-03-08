@@ -38,6 +38,12 @@ export const websiteApi = createApi({
                 body: body,
             }),
         }),
+        deleteWebsite: builder.mutation<IWebsite, IWebsite>({
+            query: (id) => ({
+                url: `website/${id}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
@@ -47,4 +53,5 @@ export const {
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
     useGetWebsiteTemplatesQuery,
+    useDeleteWebsiteMutation,
 } = websiteApi;

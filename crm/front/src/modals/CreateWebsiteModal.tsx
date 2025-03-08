@@ -65,11 +65,12 @@ const CreateWebsiteModal: React.FC = () => {
                 dispatch(closeModal());
                 refetchWebsites();
             } catch (err: any) {
-                console.error(
-                    'Error creating website:',
-                    err.data?.message || err.message
+                message.error(
+                    `Failed to delete website: ${
+                        err.data?.message || err.message
+                    }`
                 );
-                message.error('Error creating website');
+                console.error('Error creating website:', err);
             }
         } else {
             message.info('Please select template');

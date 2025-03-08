@@ -14,6 +14,7 @@ import { useGetUserDetailsQuery } from 'src/services/auth/authService';
 import { setUserDetails } from 'src/features/auth/authSlice';
 import { useEffect } from 'react';
 import EntryModal from './modals/EntryModal';
+import SettingsPage from './pages/Settings';
 
 const App = () => {
     const dispatch = useAppDispatch();
@@ -44,6 +45,8 @@ const App = () => {
                         <Route path="project">
                             <Route path=":id" element={<ProjectPage />} />
                         </Route>
+
+                        <Route path="settings" element={<SettingsPage />}></Route>
                     </Route>
 
                     <Route path="editor">

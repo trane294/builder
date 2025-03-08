@@ -12,12 +12,15 @@ import {
 } from 'antd';
 import { useAppSelector } from 'src/hooks';
 import {
+    useDeleteWebsiteMutation,
     useGetWebsiteByIdQuery,
+    useGetWebsitesQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
 import { Config } from '@measured/puck';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { IWebsite } from 'src/types';
+import DeleteConfirmation from 'src/components/DeleteConfirmation';
 
 type FieldType = {
     name?: string;
@@ -25,6 +28,7 @@ type FieldType = {
 
 const WebsiteSettingsModal: React.FC = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
     const { userInfo } = useAppSelector((state) => state.auth);
 
@@ -32,9 +36,11 @@ const WebsiteSettingsModal: React.FC = () => {
 
     const [updateWebsite, { isLoading, isError, error }] =
         useUpdateWebsiteMutation();
+    const [deleteWebsite, { isLoading: isLoadingD }] =
+        useDeleteWebsiteMutation();
+    const { refetch: refetchWebsites } = useGetWebsitesQuery();
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
-        console.log('Success:', values);
         try {
             let _website = { ...props.website };
             _website = { ..._website, ...values };
@@ -52,6 +58,21 @@ const WebsiteSettingsModal: React.FC = () => {
         errorInfo
     ) => {
         console.log('Failed:', errorInfo);
+    };
+
+    const onDeleteWebsite = async () => {
+        try {
+            await deleteWebsite(props.website.id);
+            refetchWebsites();
+            dispatch(closeModal());
+            navigate('/');
+            message.success('Website deleted successfully!');
+        } catch (err: any) {
+            message.error(
+                `Failed to delete website: ${err.data?.message || err.message}`
+            );
+            console.error('Error delete website:', err);
+        }
     };
 
     return (
@@ -98,6 +119,16 @@ const WebsiteSettingsModal: React.FC = () => {
                     <Input />
                 </Form.Item>
             </Form>
+
+            <DeleteConfirmation
+                key="delete-confirmation"
+                onDelete={() => onDeleteWebsite()}
+                itemName="website"
+            >
+                <Button loading={isLoadingD} danger>
+                    Delete
+                </Button>
+            </DeleteConfirmation>
         </AntModal>
     );
 };
