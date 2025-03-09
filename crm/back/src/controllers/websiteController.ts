@@ -175,6 +175,7 @@ export const getWebsiteById = async (
                 createdAt: true,
                 updatedAt: true,
                 data: true,
+                metadata: true,
                 user: {
                     select: {
                         firstName: true,
@@ -224,6 +225,8 @@ export const getWebsiteById = async (
  *               templateId:
  *                 type: integer
  *               data:
+ *                 type: object
+ *               metadata:
  *                 type: object
  *     responses:
  *       201:
@@ -275,7 +278,7 @@ export const createWebsite = async (
     res: Response
 ) => {
     try {
-        const { name, description, templateId, data } = req.body;
+        const { name, description, templateId, data, metadata } = req.body;
         const userId = req.userId;
 
         if (!name || !templateId) {
@@ -301,6 +304,7 @@ export const createWebsite = async (
                     connect: { id: userId },
                 },
                 data,
+                metadata,
             },
         });
 
@@ -344,6 +348,8 @@ export const createWebsite = async (
  *               templateId:
  *                 type: integer
  *               data:
+ *                 type: object
+ *               metadata:
  *                 type: object
  *     responses:
  *       200:
@@ -393,7 +399,7 @@ export const updateWebsite = async (
 ) => {
     try {
         const { id } = req.params;
-        const { name, description, templateId, data } = req.body;
+        const { name, description, templateId, data, metadata } = req.body;
         const userId = req.userId;
 
         if (!userId) {
@@ -421,6 +427,7 @@ export const updateWebsite = async (
                     ? { connect: { id: templateId } }
                     : undefined,
                 data,
+                metadata,
             },
         });
 

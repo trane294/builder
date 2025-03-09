@@ -13,14 +13,13 @@ import {
 import { useAppSelector } from 'src/hooks';
 import {
     useDeleteWebsiteMutation,
-    useGetWebsiteByIdQuery,
     useGetWebsitesQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
-import { Config } from '@measured/puck';
 import { useNavigate, useParams } from 'react-router';
 import { IWebsite } from 'src/types';
 import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
+import WebsiteMetadata from 'src/components/editor/WebsiteMetadata';
 
 type FieldType = {
     name?: string;
@@ -31,6 +30,11 @@ const WebsiteSettingsModal: React.FC = () => {
     const navigate = useNavigate();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
     const { userInfo } = useAppSelector((state) => state.auth);
+    const [metadata, setMetadata] = useState({
+        title: '',
+        description: '',
+        ogImage: '',
+    });
 
     if (!userInfo) return null;
 
@@ -44,6 +48,7 @@ const WebsiteSettingsModal: React.FC = () => {
         try {
             let _website = { ...props.website };
             _website = { ..._website, ...values };
+            _website.metadata = metadata;
             await updateWebsite(_website as IWebsite);
             message.success('Website updated successfully!');
         } catch (err: any) {
@@ -119,6 +124,8 @@ const WebsiteSettingsModal: React.FC = () => {
                     <Input />
                 </Form.Item>
             </Form>
+
+            <WebsiteMetadata metadata={metadata} onChange={setMetadata} />
 
             <DeleteConfirmation
                 key="delete-confirmation"

@@ -68,6 +68,7 @@ model Website {
     userId     Int
     user        User      @relation(fields: [userId], references: [id])
     data        Json?
+    metadata    Json?
     createdAt   DateTime  @default(now()) @db.Timestamptz(6)
     updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
     deletedAt   DateTime? @db.Timestamptz(6)

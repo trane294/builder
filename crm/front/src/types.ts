@@ -34,6 +34,12 @@ export type IWebsite = ICreateWebsite & {
     id: number;
     template: ITemplate;
     user: IUser;
+    data: object;
+    metadata: {
+        title: string;
+        description: string;
+        ogImage: string;
+    };
     createdAt: Date;
     updatedAt: Date | null;
     deletedAt: Date | null;
