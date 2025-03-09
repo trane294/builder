@@ -20,7 +20,7 @@ import {
 import { Config } from '@measured/puck';
 import { useNavigate, useParams } from 'react-router';
 import { IWebsite } from 'src/types';
-import DeleteConfirmation from 'src/components/DeleteConfirmation';
+import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
 
 type FieldType = {
     name?: string;

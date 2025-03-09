@@ -5,6 +5,10 @@ export interface AuthenticatedRequest extends Request {
     userId?: number;
 }
 
+export interface AuthenticatedRequestWithFile extends AuthenticatedRequest {
+    file?: Express.Multer.File;
+}
+
 const authMiddleware = (
     req: AuthenticatedRequest,
     res: Response,

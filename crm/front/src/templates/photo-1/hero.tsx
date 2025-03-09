@@ -4,16 +4,19 @@ import { Components } from './config';
 export type IHeroPhoto1 = {
     title: string;
     name: string;
+    imageUrl?: {
+        field: object;
+        value: string;
+    };
 };
 
-const HeroPhoto1: React.FC<IHeroPhoto1> = ({ title, name }) => {
+const HeroPhoto1: React.FC<IHeroPhoto1> = ({ title, name, imageUrl }) => {
     return (
         <div
             id="hero"
             className="relative h-screen flex flex-col items-center justify-end bg-cover bg-center text-white p-[10%]"
             style={{
-                backgroundImage:
-                    "url('https://i.wfolio.ru/x/TwCkTSnjzeE6f_BUuBXFwXbgdJ2VF8Ay/3p1guTRDJGs5wbisvzVYmo6n4suYpHbI/qL1LWWIHa1aljhYtvOfJXAKQs_tCSgAk/RTJo29LSF2p9ap-Zh0_sgMG6pDgvctAw/8X3u4WNrmhRxgKIXCqO9pJcKUtA4tcfQ/NROugTDpLobYWauHSsKmPYaA_fYpfL-D/Lc7N8JMzUXolPeMfMH6tGXQrjl1uDOF3/gX12JlRCFbNEzlKkc0B2e6GVZl3hHVKk/lcp4h_CvVPfK7yIHuO1qg8P3LaH9aNaF/-07Kml42lcsWelcOuvP_lFSlm42xPq2f/DYZW5inT0dxmH8d0b64_Ms-E1SRvSbpj/cvumRz1z7qClmXSMFpsIAgY1xF6Dt2sh/-A-4ilxaRX4J8OeoJA5B3aZCo17eMNMZ/Qc_USPqgNmHjmO0_s17OCuxpI0br-DYN/q4w-NZbajObh03Edk7IxQyqDH8DCf3qE/WE6Po8D93qnx_jsJWhbJRxJdDlOjX0OU/SKUPHFuAkilZw2iIgNgTCc9hNsgnzHea/l0MU2Dnm9jGkPiKsZNxqnYlX__9oFZwv/VZLe8-ns0mKBasZ5qALvkS9r2WEu2JpT/LuCIjNtfHes.jpg')",
+                backgroundImage: `url('${imageUrl && imageUrl.value}')`,
             }}
         >
             <div className="absolute inset-0 bg-black/50"></div>

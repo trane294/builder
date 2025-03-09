@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import userRoutes from "../routes/userRoutes";
 import websiteRoutes from "../routes/websiteRoutes";
+import fileRoutes from "../routes/fileRoutes";
 import cors from 'cors';
 
 const bodyParser = require("body-parser");
@@ -26,5 +27,6 @@ app.use(bodyParser.json());
 // Mounting routes
 app.use("/api/user", userRoutes);
 app.use("/api/website", websiteRoutes);
+app.use("/api/file", fileRoutes);
 
 export default app;

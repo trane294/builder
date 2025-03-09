@@ -1,4 +1,5 @@
-import { Config } from '@measured/puck';
+import { Config, FieldProps } from '@measured/puck';
+import ImageUploader from 'src/components/editor/ImageUploader';
 import { useAppSelector } from 'src/hooks';
 import FooterPhoto1 from 'src/templates/photo-1/footer';
 import HeroPhoto1 from 'src/templates/photo-1/hero';
@@ -10,6 +11,10 @@ export type Components = {
     HeroPhoto1: {
         title: string;
         name: string;
+        imageUrl?: {
+            field: object;
+            value: string;
+        };
     };
     MenuPhoto1: {
         children: string;
@@ -26,7 +31,9 @@ type RootProps = {
     title: string;
 };
 
-export const photo1Config = (username: string): Config<Components, RootProps> => ({
+export const photo1Config = (
+    username: string
+): Config<Components, RootProps> => ({
     components: {
         HeroPhoto1: {
             fields: {
@@ -38,15 +45,24 @@ export const photo1Config = (username: string): Config<Components, RootProps> =>
                     type: 'text',
                     label: 'Full Name',
                 },
+                imageUrl: {
+                    type: 'custom',
+                    render: ({ field, value, onChange }: FieldProps) => (
+                        <ImageUploader
+                            value={value}
+                            onChange={(url) => onChange({ field, value: url })}
+                        />
+                    ),
+                },
             },
             defaultProps: {
                 title: 'Demo Store',
                 name: username || 'John Smith',
             },
-            render: ({ title, name }) => {
+            render: ({ title, name, imageUrl }) => {
                 return (
                     <>
-                        <HeroPhoto1 title={title} name={name}></HeroPhoto1>
+                        <HeroPhoto1 title={title} name={name} imageUrl={imageUrl}></HeroPhoto1>
                     </>
                 );
             },
