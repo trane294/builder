@@ -50,16 +50,14 @@ const App = () => {
                     </Route>
 
                     <Route path="editor">
-                        <Route path=":id" element={<EditorPage />} />
-                        <Route
-                            path=":id/preview"
-                            element={<EditorPreviewPage />}
-                        />
+                        <Route path=":id/*" element={<EditorPage />} />
+                    </Route>
+                    <Route path="preview">
+                        <Route path=":id/*" element={<EditorPreviewPage />} />
                     </Route>
                 </Route>
             </Routes>
             <EntryModal />
-            {/* <WebsiteSettingsModal /> */}
         </>
     );
 };

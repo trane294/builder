@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/store';
 import { closeModal } from 'src/features/modal/modalSlice';
@@ -20,6 +20,8 @@ import { useNavigate, useParams } from 'react-router';
 import { IWebsite } from 'src/types';
 import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
 import WebsiteMetadata from 'src/components/editor/WebsiteMetadata';
+import { useSubPath } from 'src/hooks/useSubPath';
+import cloneDeep from 'lodash.clonedeep';
 
 type FieldType = {
     name?: string;
@@ -30,25 +32,48 @@ const WebsiteSettingsModal: React.FC = () => {
     const navigate = useNavigate();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
     const { userInfo } = useAppSelector((state) => state.auth);
-    const [metadata, setMetadata] = useState({
+    const currentPagePath = useSubPath({ basePath: '/editor' });
+
+    if (!userInfo) return null;
+
+    const [localMetadata, setLocalMetadata] = useState<{
+        title: string;
+        description: string;
+        ogImage: string;
+    }>({
         title: '',
         description: '',
         ogImage: '',
     });
-
-    if (!userInfo) return null;
-
     const [updateWebsite, { isLoading, isError, error }] =
         useUpdateWebsiteMutation();
     const [deleteWebsite, { isLoading: isLoadingD }] =
         useDeleteWebsiteMutation();
     const { refetch: refetchWebsites } = useGetWebsitesQuery();
 
+    useEffect(() => {
+        if (!props.website) return;
+        if (!props.website.metadata) return;
+        if (!props.website.metadata.pages) return;
+        if (props.website.metadata.pages[currentPagePath]) {
+            setLocalMetadata(props.website.metadata.pages[currentPagePath]);
+        } else {
+            setLocalMetadata({
+                title: '',
+                description: '',
+                ogImage: '',
+            });
+        }
+    }, [props, currentPagePath]);
+
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         try {
-            let _website = { ...props.website };
+            let _website = cloneDeep(props.website);
             _website = { ..._website, ...values };
-            _website.metadata = metadata;
+            if (!_website.metadata) _website.metadata = {};
+            if (!_website.metadata.pages) _website.metadata.pages = {};
+            _website.metadata.pages[currentPagePath] = localMetadata;
+
             await updateWebsite(_website as IWebsite);
             message.success('Website updated successfully!');
         } catch (err: any) {
@@ -125,7 +150,7 @@ const WebsiteSettingsModal: React.FC = () => {
                 </Form.Item>
             </Form>
 
-            <WebsiteMetadata metadata={metadata} onChange={setMetadata} />
+            <WebsiteMetadata metadata={localMetadata} onChange={setLocalMetadata} />
 
             <DeleteConfirmation
                 key="delete-confirmation"

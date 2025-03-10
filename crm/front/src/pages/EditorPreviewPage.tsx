@@ -5,11 +5,14 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useAppSelector } from 'src/hooks';
 import { useGetWebsiteByIdQuery } from 'src/services/website/websiteService';
 import { templatesLibrary } from 'src/templates/template';
+import { useSubPath } from 'src/hooks/useSubPath';
 
 export default function EditorPreviewPage() {
     const { id: websiteId } = useParams();
     const [config, setConfig] = useState<Config<any, any> | null>(null);
     const { userInfo } = useAppSelector((state) => state.auth);
+    const currentPagePath = useSubPath({ basePath: '/preview' });
+    const [currentData, setCurrentData] = useState<any>({});
 
     const [metadata, setMetadata] = useState({
         title: '',
@@ -35,23 +38,42 @@ export default function EditorPreviewPage() {
         const templateConfig = templatesLibrary[website.template.config];
         const config = templateConfig(userInfo?.firstName);
         setConfig(config);
+    }, [website, websiteId, userInfo]);
 
-        // Set metadata from website data if available
-        if (website.metadata) {
+    useEffect(() => {
+        if (!website) return;
+        if (!website.data) return;
+
+        console.log(website.data[currentPagePath]);
+
+        if (website.data[currentPagePath]) {
+            setCurrentData(website.data[currentPagePath]);
+        } else {
+            setCurrentData({});
+        }
+
+        if (
+            website.metadata &&
+            website.metadata.pages &&
+            website.metadata.pages[currentPagePath]
+        ) {
             setMetadata({
-                title: website.metadata.title || website.name || '',
-                description: website.metadata.description || '',
-                ogImage: website.metadata.ogImage || '',
+                title:
+                    website.metadata.pages[currentPagePath].title ||
+                    website.name ||
+                    '',
+                description:
+                    website.metadata.pages[currentPagePath].description || '',
+                ogImage: website.metadata.pages[currentPagePath].ogImage || '',
             });
         } else {
-            // Fallback to website name if no metadata
             setMetadata({
                 title: website.name || '',
                 description: '',
                 ogImage: '',
             });
         }
-    }, [website, websiteId, userInfo]);
+    }, [website, currentPagePath]);
 
     if (!website || isLoadingWebsite) {
         return <div>Loading website config...</div>;
@@ -102,7 +124,7 @@ export default function EditorPreviewPage() {
                         />
                     )}
                 </Helmet>
-                <Render config={config} data={website.data || {}} />
+                <Render config={config} data={currentData} />
             </HelmetProvider>
         </>
     );

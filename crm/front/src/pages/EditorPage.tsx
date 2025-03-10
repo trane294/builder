@@ -1,4 +1,4 @@
-import React, { Children, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 import { Puck, Config, usePuck } from '@measured/puck';
 import '@measured/puck/puck.css';
@@ -13,6 +13,8 @@ import { useAppSelector } from 'src/hooks';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { openModal } from 'src/features/modal/modalSlice';
+import { useSubPath } from 'src/hooks/useSubPath';
+import cloneDeep from 'lodash.clonedeep';
 
 type EditorPageProps = {};
 
@@ -20,6 +22,8 @@ export default function EditorPage(props: EditorPageProps) {
     const dispatch = useDispatch();
     const { id: websiteId } = useParams();
     const { userInfo } = useAppSelector((state) => state.auth);
+    const currentPagePath = useSubPath({ basePath: '/editor' });
+    const [currentData, setCurrentData] = useState<any>({});
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -39,10 +43,14 @@ export default function EditorPage(props: EditorPageProps) {
     const [config, setConfig] = useState<Config<any, any> | null>(null);
 
     const save = async (data: object) => {
+        if (!website) return;
         console.log('onPublish data:', data);
+
         try {
-            let _website = { ...website };
-            _website.data = data;
+            let _website = cloneDeep(website);
+            if (!_website.data) _website.data = {};
+            _website.data[currentPagePath] = data;
+
             await updateWebsite(_website as IWebsite);
             message.success('Website updated successfully!');
         } catch (err: any) {
@@ -62,8 +70,26 @@ export default function EditorPage(props: EditorPageProps) {
         setConfig(config);
     }, [website, websiteId, userInfo]);
 
+    useEffect(() => {
+        if (!website) return;
+        if (!website.data) return;
+
+        // If website data already contains page data - load it
+        if (website.data[currentPagePath]) {
+            setCurrentData(website.data[currentPagePath]);
+        } else {
+            // If there is not page data - create new one with empty object
+            setCurrentData({});
+        }
+    }, [website, currentPagePath]);
+
     const handleSettings = () => {
-        dispatch(openModal({ componentName: 'WebsiteSettingsModal', props: { website } }));
+        dispatch(
+            openModal({
+                componentName: 'WebsiteSettingsModal',
+                props: { website },
+            })
+        );
     };
 
     if (isErrorWebsite) {
@@ -80,10 +106,12 @@ export default function EditorPage(props: EditorPageProps) {
         return <div>No config found.</div>;
     }
 
+    console.log('Current page path', currentPagePath);
+
     return (
         <Puck
             config={config}
-            data={website.data || {}}
+            data={currentData}
             onPublish={save}
             overrides={{
                 headerActions: ({ children }) => {
