@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { openModal } from 'src/features/modal/modalSlice';
 import { useSubPath } from 'src/hooks/useSubPath';
 import cloneDeep from 'lodash.clonedeep';
+import EditorHeader from 'src/components/editor/EditorHeader';
 
 type EditorPageProps = {};
 
@@ -114,33 +115,42 @@ export default function EditorPage(props: EditorPageProps) {
             data={currentData}
             onPublish={save}
             overrides={{
-                headerActions: ({ children }) => {
-                    const { appState } = usePuck();
+                header: ({ actions }) => {
+                    const { appState, dispatch, history } = usePuck();
+
+                    const hideLeftMenu = () => {
+                        dispatch({
+                            type: 'setUi',
+                            ui: {
+                                leftSideBarVisible: !appState.ui.leftSideBarVisible,
+                            },
+                        });
+                    };
+
+                    const hideRightMenu = () => {
+                        dispatch({
+                            type: 'setUi',
+                            ui: {
+                                rightSideBarVisible: !appState.ui.rightSideBarVisible,
+                            },
+                        });
+                    };
 
                     return (
                         <>
-                            <Link to="/">
-                                <Button
-                                    type="default"
-                                    icon={<HomeOutlined />}
-                                    size={'middle'}
-                                />
-                            </Link>
-                            <Button
-                                type="primary"
-                                size={'middle'}
-                                loading={isUpdating}
-                                onClick={() => {
-                                    save(appState.data);
-                                }}
-                            >
-                                Save
-                            </Button>
-                            <Button
-                                type="default"
-                                icon={<SettingOutlined />}
-                                size={'middle'}
-                                onClick={() => handleSettings()}
+                            <EditorHeader
+                                title="My Page"
+                                isLeftSidebarCollapsed={appState.ui.leftSideBarVisible}
+                                isRightSidebarCollapsed={appState.ui.rightSideBarVisible}
+                                onLeftToggleSidebar={hideLeftMenu}
+                                onRightToggleSidebar={hideRightMenu}
+                                onUndo={() => history.back()}
+                                onRedo={() => history.forward()}
+                                canUndo={history.hasPast}
+                                canRedo={history.hasFuture}
+                                isSaving={isUpdating}
+                                onSave={() => save(appState.data)}
+                                onSettings={() => handleSettings()}
                             />
                         </>
                     );
