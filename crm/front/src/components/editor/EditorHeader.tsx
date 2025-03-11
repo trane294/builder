@@ -9,6 +9,7 @@ import {
     SettingOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router';
+import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -19,7 +20,6 @@ const headerStyles = {
         borderBottom: '1px solid var(--puck-color-grey-09)',
         color: 'var(--puck-color-black)',
         gridArea: 'header',
-        // position: 'relative',
         maxWidth: '100vw',
     },
     headerInner: {
@@ -54,6 +54,7 @@ interface EditorHeaderProps {
     isSaving?: boolean;
     onSave?: () => void;
     onSettings?: () => void;
+    pagesDropdown?: React.ReactNode;
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -69,6 +70,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     isSaving = false,
     onSave = () => {},
     onSettings = () => {},
+    pagesDropdown,
 }) => {
     return (
         <div style={headerStyles.header}>
@@ -87,6 +89,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                             onClick={onRightToggleSidebar}
                             style={{ fontSize: '16px' }}
                         />
+                        {pagesDropdown}
                     </Space>
                 </div>
                 <div style={headerStyles.headerTitle}>

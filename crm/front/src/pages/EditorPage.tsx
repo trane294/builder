@@ -1,41 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { Puck, Config, usePuck } from '@measured/puck';
 import '@measured/puck/puck.css';
 import {
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
-import { Button, message } from 'antd';
+import { message } from 'antd';
 import { IWebsite } from 'src/types';
 import { templatesLibrary } from 'src/templates/template';
 import { useAppSelector } from 'src/hooks';
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { openModal } from 'src/features/modal/modalSlice';
 import { useSubPath } from 'src/hooks/useSubPath';
 import cloneDeep from 'lodash.clonedeep';
 import EditorHeader from 'src/components/editor/EditorHeader';
+import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const location = useLocation();
     const { id: websiteId } = useParams();
     const { userInfo } = useAppSelector((state) => state.auth);
     const currentPagePath = useSubPath({ basePath: '/editor' });
     const [currentData, setCurrentData] = useState<any>({});
+    const [website, setWebsite] = useState<IWebsite | null>(null);
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
     }
 
     const {
-        data: website,
+        data: _website,
         isLoading: isLoadingWebsite,
         isError: isErrorWebsite,
         error: errorWebsite,
-    } = useGetWebsiteByIdQuery(websiteId);
+        refetch: refetchWebsite,
+    } = useGetWebsiteByIdQuery(websiteId, {
+        refetchOnMountOrArgChange: true,
+    });
 
     const [
         updateWebsite,
@@ -45,7 +51,8 @@ export default function EditorPage(props: EditorPageProps) {
 
     const save = async (data: object) => {
         if (!website) return;
-        console.log('onPublish data:', data);
+        // We need to update state data first
+        setCurrentData(data);
 
         try {
             let _website = cloneDeep(website);
@@ -53,6 +60,7 @@ export default function EditorPage(props: EditorPageProps) {
             _website.data[currentPagePath] = data;
 
             await updateWebsite(_website as IWebsite);
+            await refetchWebsite();
             message.success('Website updated successfully!');
         } catch (err: any) {
             message.error(
@@ -61,6 +69,12 @@ export default function EditorPage(props: EditorPageProps) {
             console.error('Error updating website:', err);
         }
     };
+
+    useEffect(() => {
+        if (_website) {
+            setWebsite(_website);
+        }
+    }, [_website]);
 
     useEffect(() => {
         if (!website) return;
@@ -75,14 +89,12 @@ export default function EditorPage(props: EditorPageProps) {
         if (!website) return;
         if (!website.data) return;
 
-        // If website data already contains page data - load it
         if (website.data[currentPagePath]) {
             setCurrentData(website.data[currentPagePath]);
         } else {
-            // If there is not page data - create new one with empty object
             setCurrentData({});
         }
-    }, [website, currentPagePath]);
+    }, [website, currentPagePath, location]);
 
     const handleSettings = () => {
         dispatch(
@@ -91,6 +103,47 @@ export default function EditorPage(props: EditorPageProps) {
                 props: { website },
             })
         );
+    };
+
+    const handlePageSelect = (page: string) => {
+        if (!website) return;
+
+        let url = `/editor/${website.id}/${page}`;
+        if (page === '/') url = `/editor/${website.id}`;
+
+        return navigate(url);
+    };
+
+    const handleAddPage = () => {
+        if (!website) return;
+        // navigate(`/editor/${website.id}/new_page`);
+    };
+
+    const handleDeletePage = async (path: string) => {
+        if (!website) return;
+
+        try {
+            let _website = cloneDeep(website);
+            if (_website.data[path]) delete _website.data[path];
+            if (
+                _website.metadata &&
+                _website.metadata.pages &&
+                _website.metadata.pages[path]
+            ) {
+                delete _website.metadata.pages[path];
+            }
+
+            console.log(_website);
+
+            await updateWebsite(_website as IWebsite);
+            await refetchWebsite();
+            message.success('Page deleted successfully!');
+        } catch (err: any) {
+            message.error(
+                `Failed to update website: ${err.data?.message || err.message}`
+            );
+            console.error('Error updating website:', err);
+        }
     };
 
     if (isErrorWebsite) {
@@ -107,8 +160,6 @@ export default function EditorPage(props: EditorPageProps) {
         return <div>No config found.</div>;
     }
 
-    console.log('Current page path', currentPagePath);
-
     return (
         <Puck
             config={config}
@@ -118,11 +169,19 @@ export default function EditorPage(props: EditorPageProps) {
                 header: ({ actions }) => {
                     const { appState, dispatch, history } = usePuck();
 
+                    useEffect(() => {
+                        dispatch({
+                            type: 'setData',
+                            data: currentData,
+                        });
+                    }, [currentData, dispatch]);
+
                     const hideLeftMenu = () => {
                         dispatch({
                             type: 'setUi',
                             ui: {
-                                leftSideBarVisible: !appState.ui.leftSideBarVisible,
+                                leftSideBarVisible:
+                                    !appState.ui.leftSideBarVisible,
                             },
                         });
                     };
@@ -131,7 +190,8 @@ export default function EditorPage(props: EditorPageProps) {
                         dispatch({
                             type: 'setUi',
                             ui: {
-                                rightSideBarVisible: !appState.ui.rightSideBarVisible,
+                                rightSideBarVisible:
+                                    !appState.ui.rightSideBarVisible,
                             },
                         });
                     };
@@ -140,8 +200,12 @@ export default function EditorPage(props: EditorPageProps) {
                         <>
                             <EditorHeader
                                 title="My Page"
-                                isLeftSidebarCollapsed={appState.ui.leftSideBarVisible}
-                                isRightSidebarCollapsed={appState.ui.rightSideBarVisible}
+                                isLeftSidebarCollapsed={
+                                    appState.ui.leftSideBarVisible
+                                }
+                                isRightSidebarCollapsed={
+                                    appState.ui.rightSideBarVisible
+                                }
                                 onLeftToggleSidebar={hideLeftMenu}
                                 onRightToggleSidebar={hideRightMenu}
                                 onUndo={() => history.back()}
@@ -151,6 +215,15 @@ export default function EditorPage(props: EditorPageProps) {
                                 isSaving={isUpdating}
                                 onSave={() => save(appState.data)}
                                 onSettings={() => handleSettings()}
+                                pagesDropdown={
+                                    <PagesDropdownComponent
+                                        website={website}
+                                        currentPath={currentPagePath}
+                                        onPageSelect={handlePageSelect}
+                                        onAddPage={handleAddPage}
+                                        onDeletePage={handleDeletePage}
+                                    />
+                                }
                             />
                         </>
                     );

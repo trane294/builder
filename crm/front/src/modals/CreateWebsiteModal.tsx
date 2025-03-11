@@ -63,7 +63,7 @@ const CreateWebsiteModal: React.FC = () => {
 
                 message.success('Website created');
                 dispatch(closeModal());
-                refetchWebsites();
+                await refetchWebsites();
             } catch (err: any) {
                 message.error(
                     `Failed to delete website: ${

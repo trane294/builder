@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import { Dropdown, Input, Button, theme, Divider } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Dropdown, Input, Button, theme, Divider, Spin } from 'antd';
 import {
     DownOutlined,
     HomeOutlined,
     FileOutlined,
     SearchOutlined,
+    DeleteOutlined,
 } from '@ant-design/icons';
+import { IWebsite } from 'src/types';
+import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
+import { useUpdateWebsiteMutation } from 'src/services/website/websiteService';
 
 interface Page {
     key: string;
@@ -20,6 +24,7 @@ interface PagesDropdownProps {
     onPageSelect?: (path: string) => void;
     onAddPage?: () => void;
     onSearch?: (query: string) => void;
+    onDeletePage?: (path: string) => void;
 }
 
 const PagesDropdown: React.FC<PagesDropdownProps> = ({
@@ -28,16 +33,24 @@ const PagesDropdown: React.FC<PagesDropdownProps> = ({
     onPageSelect,
     onAddPage,
     onSearch,
+    onDeletePage,
 }) => {
     const { token } = theme.useToken();
     const [open, setOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [hoveredPath, setHoveredPath] = useState<string | null>(null);
 
     const handlePageClick = (path: string) => {
         if (onPageSelect) {
             onPageSelect(path);
         }
         setOpen(false);
+    };
+
+    const handleDeletePage = (path: string) => {
+        if (onDeletePage) {
+            onDeletePage(path);
+        }
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,41 +108,58 @@ const PagesDropdown: React.FC<PagesDropdownProps> = ({
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             backgroundColor: page.isActive
                                 ? token.colorBgTextHover
                                 : 'transparent',
                             transition: 'background-color 0.2s',
                         }}
                         onClick={() => handlePageClick(page.path)}
-                        onMouseEnter={(e) => {
+                        onMouseEnter={() => {
                             if (!page.isActive) {
-                                e.currentTarget.style.backgroundColor =
-                                    token.colorBgTextActive;
+                                setHoveredPath(page.path);
                             }
                         }}
-                        onMouseLeave={(e) => {
+                        onMouseLeave={() => {
                             if (!page.isActive) {
-                                e.currentTarget.style.backgroundColor =
-                                    'transparent';
+                                setHoveredPath(null);
                             }
                         }}
                     >
-                        {page.isHome ? (
-                            <HomeOutlined
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {page.isHome ? (
+                                <HomeOutlined
+                                    style={{
+                                        marginRight: 8,
+                                        color: token.colorTextSecondary,
+                                    }}
+                                />
+                            ) : (
+                                <FileOutlined
+                                    style={{
+                                        marginRight: 8,
+                                        color: token.colorTextSecondary,
+                                    }}
+                                />
+                            )}
+                            <span>{page.path}</span>
+                        </div>
+                        <DeleteConfirmation
+                            itemName="page"
+                            title={`Delete page '${page.path}'`}
+                            description={`Are you sure you want to delete the page "${page.path}"?`}
+                            onDelete={() => handleDeletePage(page.path)}
+                            placement="topRight"
+                        >
+                            <DeleteOutlined
                                 style={{
-                                    marginRight: 8,
                                     color: token.colorTextSecondary,
+                                    opacity: hoveredPath === page.path ? 1 : 0,
+                                    transition: 'opacity 0.2s',
                                 }}
+                                onClick={(e) => e.stopPropagation()} // Prevent dropdown from closing
                             />
-                        ) : (
-                            <FileOutlined
-                                style={{
-                                    marginRight: 8,
-                                    color: token.colorTextSecondary,
-                                }}
-                            />
-                        )}
-                        <span>{page.path}</span>
+                        </DeleteConfirmation>
                     </div>
                 ))}
             </div>
@@ -177,24 +207,50 @@ const PagesDropdown: React.FC<PagesDropdownProps> = ({
     );
 };
 
-// Example usage
-const PagesDropdownExample: React.FC = () => {
-    const samplePages: Page[] = [
-        { key: 'home', path: 'Home', isHome: true },
-        { key: 'sample', path: '/sample/2/3', isActive: true },
-        { key: 'about', path: '/about' },
-        { key: 'contact', path: '/contact' },
-    ];
+interface IPagesDropdownComponent {
+    website?: IWebsite;
+    currentPath: string;
+    onPageSelect: (path: string) => void;
+    onAddPage: () => void;
+    onDeletePage: (path: string) => void;
+}
+
+const PagesDropdownComponent: React.FC<IPagesDropdownComponent> = ({
+    website,
+    currentPath,
+    onPageSelect,
+    onAddPage,
+    onDeletePage,
+}) => {
+    const [pages, setPages] = useState<Page[]>([]);
+    const [updateWebsite, { isLoading }] = useUpdateWebsiteMutation();
+
+    useEffect(() => {
+        if (!website) return;
+        const _pages: Page[] = [];
+        for (const path in website.data) {
+            _pages.push({
+                key: path,
+                path: path,
+                isHome: path === '/',
+                isActive: path === currentPath,
+            });
+        }
+        setPages(_pages);
+    }, [website, currentPath]);
 
     return (
-        <PagesDropdown
-            pages={samplePages}
-            currentPath="sample/2/3"
-            onPageSelect={(path) => console.log(`Selected: ${path}`)}
-            onAddPage={() => console.log('Add page clicked')}
-            onSearch={(query) => console.log(`Search: ${query}`)}
-        />
+        <Spin spinning={isLoading}>
+            <PagesDropdown
+                pages={pages}
+                currentPath={currentPath}
+                onPageSelect={onPageSelect}
+                onAddPage={onAddPage}
+                onDeletePage={onDeletePage}
+                onSearch={(query) => console.log(`Search: ${query}`)}
+            />
+        </Spin>
     );
 };
 
-export default PagesDropdownExample;
+export default PagesDropdownComponent;

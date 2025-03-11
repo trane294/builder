@@ -30,15 +30,20 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
     description,
     placement = 'topRight',
 }) => {
-    const handleConfirm = (): void => {
-        // Call the provided delete handler
+    const handleConfirm = (
+        e: React.MouseEvent<HTMLElement, MouseEvent> | undefined
+    ): void => {
+        if (e) e.stopPropagation();
         if (onDelete && typeof onDelete === 'function') {
             onDelete();
         }
         // message.success(`${itemName} deleted successfully`);
     };
 
-    const handleCancel = (): void => {
+    const handleCancel = (
+        e: React.MouseEvent<HTMLElement, MouseEvent> | undefined
+    ): void => {
+        if (e) e.stopPropagation();
         // message.info('Delete cancelled');
     };
 
@@ -49,15 +54,34 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
                 description ||
                 `Are you sure you want to delete this ${itemName}?`
             }
-            onConfirm={handleConfirm}
-            onCancel={handleCancel}
+            onConfirm={(e) => handleConfirm(e)}
+            onCancel={(e) => handleCancel(e)}
             okText="Yes"
             cancelText="No"
             placement={placement}
+            styles={{
+                root: { width: 250 },
+            }}
+            classNames={{
+                root: 'custom-popconfirm',
+            }}
+            onPopupClick={(e) => e.stopPropagation()}
         >
             {children}
         </Popconfirm>
     );
 };
+
+// Add CSS to adjust font size
+const style = document.createElement('style');
+style.textContent = `
+    .custom-popconfirm .ant-popconfirm-description {
+        font-size: 10px;
+    }
+    .custom-popconfirm .ant-popconfirm-title {
+        font-size: 12px;
+    }
+`;
+document.head.appendChild(style);
 
 export default DeleteConfirmation;

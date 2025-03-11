@@ -93,7 +93,7 @@ const WebsiteSettingsModal: React.FC = () => {
     const onDeleteWebsite = async () => {
         try {
             await deleteWebsite(props.website.id);
-            refetchWebsites();
+            await refetchWebsites();
             dispatch(closeModal());
             navigate('/');
             message.success('Website deleted successfully!');
