@@ -16,6 +16,7 @@ import { useSubPath } from 'src/hooks/useSubPath';
 import cloneDeep from 'lodash.clonedeep';
 import EditorHeader from 'src/components/editor/EditorHeader';
 import PagesDropdownComponent from 'src/components/editor/PagesPopup';
+import AddPageModal from 'src/modals/AddPageModal';
 
 type EditorPageProps = {};
 
@@ -28,6 +29,7 @@ export default function EditorPage(props: EditorPageProps) {
     const currentPagePath = useSubPath({ basePath: '/editor' });
     const [currentData, setCurrentData] = useState<any>({});
     const [website, setWebsite] = useState<IWebsite | null>(null);
+    const [isAddPageModalOpen, setIsAddPageModalOpen] = useState(false);
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -115,8 +117,43 @@ export default function EditorPage(props: EditorPageProps) {
     };
 
     const handleAddPage = () => {
+        setIsAddPageModalOpen(true);
+    };
+
+    const handleAddNewPage = async (path: string) => {
         if (!website) return;
-        // navigate(`/editor/${website.id}/new_page`);
+
+        try {
+            let _website = cloneDeep(website);
+            _website.data[path] = {
+                content: [],
+                root: {
+                    props: {},
+                },
+                zones: {},
+            };
+
+            if (!_website.metadata) {
+                _website.metadata = {
+                    pages: {},
+                };
+            }
+
+            _website.metadata.pages[path] = {
+                title: '',
+                description: '',
+                ogImage: '',
+            };
+
+            await updateWebsite(_website as IWebsite);
+            await refetchWebsite();
+            handlePageSelect(path);
+        } catch (err: any) {
+            message.error(
+                `Failed to create page: ${err.data?.message || err.message}`
+            );
+            console.error('Error adding page:', err);
+        }
     };
 
     const handleDeletePage = async (path: string) => {
@@ -133,8 +170,6 @@ export default function EditorPage(props: EditorPageProps) {
                 delete _website.metadata.pages[path];
             }
 
-            console.log(_website);
-
             await updateWebsite(_website as IWebsite);
             await refetchWebsite();
             message.success('Page deleted successfully!');
@@ -142,7 +177,7 @@ export default function EditorPage(props: EditorPageProps) {
             message.error(
                 `Failed to update website: ${err.data?.message || err.message}`
             );
-            console.error('Error updating website:', err);
+            console.error('Error deleting page:', err);
         }
     };
 
@@ -161,74 +196,81 @@ export default function EditorPage(props: EditorPageProps) {
     }
 
     return (
-        <Puck
-            config={config}
-            data={currentData}
-            onPublish={save}
-            overrides={{
-                header: ({ actions }) => {
-                    const { appState, dispatch, history } = usePuck();
+        <>
+            <AddPageModal
+                isOpen={isAddPageModalOpen}
+                onClose={() => setIsAddPageModalOpen(false)}
+                onAddPage={handleAddNewPage}
+            />
+            <Puck
+                config={config}
+                data={currentData}
+                onPublish={save}
+                overrides={{
+                    header: ({ actions }) => {
+                        const { appState, dispatch, history } = usePuck();
 
-                    useEffect(() => {
-                        dispatch({
-                            type: 'setData',
-                            data: currentData,
-                        });
-                    }, [currentData, dispatch]);
+                        useEffect(() => {
+                            dispatch({
+                                type: 'setData',
+                                data: currentData,
+                            });
+                        }, [currentData, dispatch]);
 
-                    const hideLeftMenu = () => {
-                        dispatch({
-                            type: 'setUi',
-                            ui: {
-                                leftSideBarVisible:
-                                    !appState.ui.leftSideBarVisible,
-                            },
-                        });
-                    };
+                        const hideLeftMenu = () => {
+                            dispatch({
+                                type: 'setUi',
+                                ui: {
+                                    leftSideBarVisible:
+                                        !appState.ui.leftSideBarVisible,
+                                },
+                            });
+                        };
 
-                    const hideRightMenu = () => {
-                        dispatch({
-                            type: 'setUi',
-                            ui: {
-                                rightSideBarVisible:
-                                    !appState.ui.rightSideBarVisible,
-                            },
-                        });
-                    };
+                        const hideRightMenu = () => {
+                            dispatch({
+                                type: 'setUi',
+                                ui: {
+                                    rightSideBarVisible:
+                                        !appState.ui.rightSideBarVisible,
+                                },
+                            });
+                        };
 
-                    return (
-                        <>
-                            <EditorHeader
-                                title="My Page"
-                                isLeftSidebarCollapsed={
-                                    appState.ui.leftSideBarVisible
-                                }
-                                isRightSidebarCollapsed={
-                                    appState.ui.rightSideBarVisible
-                                }
-                                onLeftToggleSidebar={hideLeftMenu}
-                                onRightToggleSidebar={hideRightMenu}
-                                onUndo={() => history.back()}
-                                onRedo={() => history.forward()}
-                                canUndo={history.hasPast}
-                                canRedo={history.hasFuture}
-                                isSaving={isUpdating}
-                                onSave={() => save(appState.data)}
-                                onSettings={() => handleSettings()}
-                                pagesDropdown={
-                                    <PagesDropdownComponent
-                                        website={website}
-                                        currentPath={currentPagePath}
-                                        onPageSelect={handlePageSelect}
-                                        onAddPage={handleAddPage}
-                                        onDeletePage={handleDeletePage}
-                                    />
-                                }
-                            />
-                        </>
-                    );
-                },
-            }}
-        />
+                        return (
+                            <>
+                                <EditorHeader
+                                    title="My Page"
+                                    isLeftSidebarCollapsed={
+                                        appState.ui.leftSideBarVisible
+                                    }
+                                    isRightSidebarCollapsed={
+                                        appState.ui.rightSideBarVisible
+                                    }
+                                    onLeftToggleSidebar={hideLeftMenu}
+                                    onRightToggleSidebar={hideRightMenu}
+                                    onUndo={() => history.back()}
+                                    onRedo={() => history.forward()}
+                                    canUndo={history.hasPast}
+                                    canRedo={history.hasFuture}
+                                    isSaving={isUpdating}
+                                    onSave={() => save(appState.data)}
+                                    onSettings={() => handleSettings()}
+                                    pagesDropdown={
+                                        <PagesDropdownComponent
+                                            website={website}
+                                            currentPath={currentPagePath}
+                                            onPageSelect={handlePageSelect}
+                                            onAddPage={handleAddPage}
+                                            onDeletePage={handleDeletePage}
+                                        />
+                                    }
+                                />
+                            </>
+                        );
+                    },
+                }}
+            />
+        </>
     );
 }
