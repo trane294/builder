@@ -19,22 +19,24 @@ const AddPageModal: React.FC<AddPageModalProps> = ({
         try {
             setIsAdding(true);
             const values = await form.validateFields();
+            let path = values.path;
+            if (path === undefined) path = '/';
             // Validate the path format
             const regex = /^[a-zA-Z0-9\/-]+$/;
-            if (!regex.test(values.path)) {
+            if (!regex.test(path)) {
                 message.error(
                     'Invalid path format. Only letters, numbers, hyphens, and forward slashes are allowed (no spaces).'
                 );
                 return;
             }
-            if (values.path.startsWith('/')) {
+            if (path.length > 1 && path.startsWith('/')) {
                 message.error(
                     'Invalid path format. Path should not start with /'
                 );
                 return;
             }
 
-            onAddPage(values.path);
+            onAddPage(path);
             form.resetFields();
             onClose();
             setIsAdding(false);
@@ -65,13 +67,7 @@ const AddPageModal: React.FC<AddPageModalProps> = ({
             <Form form={form} layout="vertical">
                 <Form.Item
                     name="path"
-                    label="Page Path"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please enter the page path!',
-                        },
-                    ]}
+                    label="Page url"
                 >
                     <Input placeholder="e.g., about-us/team" />
                 </Form.Item>

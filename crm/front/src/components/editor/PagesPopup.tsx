@@ -200,7 +200,7 @@ const PagesDropdown: React.FC<PagesDropdownProps> = ({
                     color: 'white',
                 }}
             >
-                {currentPath}
+                {currentPath === '/' ? 'Home' : currentPath}
                 <DownOutlined style={{ marginLeft: 8 }} />
             </Button>
         </Dropdown>
@@ -231,7 +231,7 @@ const PagesDropdownComponent: React.FC<IPagesDropdownComponent> = ({
         for (const path in website.data) {
             _pages.push({
                 key: path,
-                path: path,
+                path: path === '/' ? 'Home' : path,
                 isHome: path === '/',
                 isActive: path === currentPath,
             });
