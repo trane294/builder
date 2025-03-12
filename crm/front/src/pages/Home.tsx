@@ -7,13 +7,19 @@ import { IWebsite } from 'src/types';
 import EntryModal from 'src/modals/EntryModal';
 import { openModal } from 'src/features/modal/modalSlice';
 import { Button, List } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 function Home() {
+    const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
     const { data: projects, isLoading, error } = useGetWebsitesQuery();
 
     const handleOpenModal = () => {
         dispatch(openModal({ componentName: 'CreateWebsiteModal' }));
+    };
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng);
     };
 
     if (isLoading) {
@@ -22,6 +28,14 @@ function Home() {
 
     return (
         <>
+            <div>
+                <h1>{t('welcome')}</h1>
+                <p>{t('description')}</p>
+                <p>{t('hello')}</p>
+                <button onClick={() => changeLanguage('en')}>English</button>
+                <button onClick={() => changeLanguage('ru')}>Russian</button>
+                <br /><br />
+            </div>
             <div>
                 <Button type={'primary'} onClick={handleOpenModal}>
                     Create Project
