@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
-import { Puck, Config, usePuck } from '@measured/puck';
+import {
+    Puck,
+    Config,
+    usePuck,
+    PuckAction,
+    AppState,
+    DefaultComponentProps,
+    Data,
+} from '@measured/puck';
 import '@measured/puck/puck.css';
 import {
     useGetWebsiteByIdQuery,
@@ -17,19 +25,24 @@ import cloneDeep from 'lodash.clonedeep';
 import EditorHeader from 'src/components/editor/EditorHeader';
 import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 import AddPageModal from 'src/modals/AddPageModal';
+import { isEqual } from 'src/utils';
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
+    const emtpyPage = JSON.parse('{"root":{"props":{}},"content":[],"zones":{}}');
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const { id: websiteId } = useParams();
     const { userInfo } = useAppSelector((state) => state.auth);
     const currentPagePath = useSubPath({ basePath: '/editor' });
-    const [currentData, setCurrentData] = useState<any>({});
+    const [puckData, setPuckData] = useState<any>(emtpyPage);
     const [website, setWebsite] = useState<IWebsite | null>(null);
     const [isAddPageModalOpen, setIsAddPageModalOpen] = useState(false);
+    const puckAppStateRef = useRef<AppState | null>(null);
+    const puckDispatchRef = useRef<((action: PuckAction) => void) | null>(null);
+    const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -51,18 +64,95 @@ export default function EditorPage(props: EditorPageProps) {
     ] = useUpdateWebsiteMutation();
     const [config, setConfig] = useState<Config<any, any> | null>(null);
 
-    const save = async (data: object) => {
-        if (!website) return;
-        // We need to update state data first
-        setCurrentData(data);
+    // Main init method
+    useEffect(() => {
+        if (!website && _website) {
+            setWebsite(_website);
 
-        try {
+            let newData = {};
+            if (_website.data[currentPagePath]) {
+                console.log('current data:', _website.data[currentPagePath]);
+                newData = _website.data[currentPagePath];
+            }
+
+            console.log('setPuckData', newData);
+            setPuckData(newData);
+        }
+    }, [_website]);
+
+    useEffect(() => {
+        if (!website) return;
+        if (!userInfo) return;
+        // If config already loaded we should ignore it
+        if (config) return;
+
+        const templateConfig = templatesLibrary[website.template.config];
+        const _config = templateConfig(userInfo?.firstName);
+        setConfig(_config);
+    }, [website, websiteId, userInfo]);
+
+    useEffect(() => {
+        if (!website) return;
+        if (!website.data) return;
+
+        const locationParts = location.pathname.split('/');
+        let locationPathPart = locationParts[3];
+        if (!locationPathPart)  locationPathPart = '/';
+        if (locationPathPart !== currentPagePath) return;
+
+        console.log(
+            'useEffect: location',
+            website.data,
+            location,
+            currentPagePath
+        );
+        let newData = emtpyPage;
+        if (website.data[currentPagePath]) {
+            console.log('current data:', website.data[currentPagePath]);
+            newData = website.data[currentPagePath];
+        }
+
+        console.log('setPuckData', newData);
+        setPuckData(newData);
+        // Dispatch setData to Puck using the ref
+        if (puckDispatchRef.current) {
+            console.log('puckDispatchRef setData', newData);
+            puckDispatchRef.current({
+                type: 'setData',
+                data: newData,
+            });
+            forceUpdate();
+        }
+    }, [location, currentPagePath]);
+
+    const saveWebsiteState = (): Promise<IWebsite> => {
+        return new Promise((resolve, reject) => {
+            if (!website) {
+                return reject(new Error('Website is not defined'));
+            }
+            if (!puckAppStateRef.current) {
+                return reject(new Error('Puck app state is not available'));
+            }
+
+            const data = puckAppStateRef.current.data;
+            console.log('saveWebsiteState data:', data);
+
+            setPuckData(data);
+            // Put new page changes into `website` state
             let _website = cloneDeep(website);
             if (!_website.data) _website.data = {};
             _website.data[currentPagePath] = data;
+            setWebsite(_website);
 
-            await updateWebsite(_website as IWebsite);
-            await refetchWebsite();
+            return resolve(_website);
+        });
+    };
+
+    const handleSave = async () => {
+        try {
+            const website = await saveWebsiteState();
+            console.log('saveWebsite data:', website);
+            await updateWebsite(website);
             message.success('Website updated successfully!');
         } catch (err: any) {
             message.error(
@@ -71,32 +161,6 @@ export default function EditorPage(props: EditorPageProps) {
             console.error('Error updating website:', err);
         }
     };
-
-    useEffect(() => {
-        if (_website) {
-            setWebsite(_website);
-        }
-    }, [_website]);
-
-    useEffect(() => {
-        if (!website) return;
-        if (!userInfo) return;
-
-        const templateConfig = templatesLibrary[website.template.config];
-        const config = templateConfig(userInfo?.firstName);
-        setConfig(config);
-    }, [website, websiteId, userInfo]);
-
-    useEffect(() => {
-        if (!website) return;
-        if (!website.data) return;
-
-        if (website.data[currentPagePath]) {
-            setCurrentData(website.data[currentPagePath]);
-        } else {
-            setCurrentData({});
-        }
-    }, [website, currentPagePath, location]);
 
     const handleSettings = () => {
         dispatch(
@@ -107,11 +171,11 @@ export default function EditorPage(props: EditorPageProps) {
         );
     };
 
-    const handlePageSelect = (page: string) => {
-        if (!website) return;
+    const handlePageSelect = async (page: string) => {
+        const website = await saveWebsiteState();
 
         let url = `/editor/${website.id}/${page}`;
-        if (page === '/') url = `/editor/${website.id}`;
+        if (page === '/' || page === 'Home') url = `/editor/${website.id}`;
 
         return navigate(url);
     };
@@ -121,17 +185,15 @@ export default function EditorPage(props: EditorPageProps) {
     };
 
     const handleAddNewPage = async (path: string) => {
-        if (!website) return;
+        const website = await saveWebsiteState();
+        const emptyPage = JSON.parse('{"root":{"props":{}},"content":[],"zones":{}}');
 
         try {
             let _website = cloneDeep(website);
-            _website.data[path] = {
-                content: [],
-                root: {
-                    props: {},
-                },
-                zones: {},
-            };
+
+            if (!_website.data) {
+                _website.data = {};
+            }
 
             if (!_website.metadata) {
                 _website.metadata = {
@@ -139,13 +201,17 @@ export default function EditorPage(props: EditorPageProps) {
                 };
             }
 
+            _website.data[path] = emptyPage;
             _website.metadata.pages[path] = {
                 title: '',
                 description: '',
                 ogImage: '',
             };
 
-            await updateWebsite(_website as IWebsite);
+            console.log('handleAddNewPage data:', _website);
+            setPuckData(emptyPage);
+            setWebsite(_website);
+            await updateWebsite(_website);
             await refetchWebsite();
             handlePageSelect(path);
         } catch (err: any) {
@@ -157,7 +223,7 @@ export default function EditorPage(props: EditorPageProps) {
     };
 
     const handleDeletePage = async (path: string) => {
-        if (!website) return;
+        const website = await saveWebsiteState();
 
         try {
             let _website = cloneDeep(website);
@@ -179,6 +245,15 @@ export default function EditorPage(props: EditorPageProps) {
             );
             console.error('Error deleting page:', err);
         }
+    };
+
+    const handlePagePreview = () => {
+        if (!website) return;
+
+        const url = `/preview/${website.id}/${
+            currentPagePath === '/' ? '' : currentPagePath
+        }`;
+        window.open(url, '_blank');
     };
 
     if (isErrorWebsite) {
@@ -204,18 +279,16 @@ export default function EditorPage(props: EditorPageProps) {
             />
             <Puck
                 config={config}
-                data={currentData}
-                onPublish={save}
+                data={puckData}
+                onPublish={handleSave}
                 overrides={{
                     header: ({ actions }) => {
                         const { appState, dispatch, history } = usePuck();
 
-                        useEffect(() => {
-                            dispatch({
-                                type: 'setData',
-                                data: currentData,
-                            });
-                        }, [currentData, dispatch]);
+                        // Store the appState in the ref
+                        puckAppStateRef.current = appState;
+                        // Store the dispatch function in the ref
+                        puckDispatchRef.current = dispatch;
 
                         const hideLeftMenu = () => {
                             dispatch({
@@ -251,10 +324,11 @@ export default function EditorPage(props: EditorPageProps) {
                                     onRightToggleSidebar={hideRightMenu}
                                     onUndo={() => history.back()}
                                     onRedo={() => history.forward()}
+                                    onPagePreview={handlePagePreview}
                                     canUndo={history.hasPast}
                                     canRedo={history.hasFuture}
                                     isSaving={isUpdating}
-                                    onSave={() => save(appState.data)}
+                                    onSave={() => handleSave()}
                                     onSettings={() => handleSettings()}
                                     pagesDropdown={
                                         <PagesDropdownComponent

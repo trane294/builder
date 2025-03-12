@@ -227,6 +227,7 @@ const PagesDropdownComponent: React.FC<IPagesDropdownComponent> = ({
 
     useEffect(() => {
         if (!website) return;
+
         const _pages: Page[] = [];
         for (const path in website.data) {
             _pages.push({
@@ -237,7 +238,7 @@ const PagesDropdownComponent: React.FC<IPagesDropdownComponent> = ({
             });
         }
         setPages(_pages);
-    }, [website, currentPath]);
+    }, [website]);
 
     return (
         <Spin spinning={isLoading}>

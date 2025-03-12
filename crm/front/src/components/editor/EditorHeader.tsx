@@ -7,6 +7,7 @@ import {
     MenuFoldOutlined,
     HomeOutlined,
     SettingOutlined,
+    LinkOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router';
 import PagesDropdownComponent from 'src/components/editor/PagesPopup';
@@ -49,6 +50,7 @@ interface EditorHeaderProps {
     onRightToggleSidebar?: () => void;
     onUndo?: () => void;
     onRedo?: () => void;
+    onPagePreview?: () => void;
     canUndo?: boolean;
     canRedo?: boolean;
     isSaving?: boolean;
@@ -65,6 +67,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     onRightToggleSidebar = () => {},
     onUndo = () => {},
     onRedo = () => {},
+    onPagePreview = () => {},
     canUndo = true,
     canRedo = true,
     isSaving = false,
@@ -97,7 +100,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                         level={4}
                         style={{
                             margin: 0,
-                            fontWeight: 600,
                         }}
                     >
                         {title}
@@ -142,6 +144,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                             icon={<SettingOutlined />}
                             size={'middle'}
                             onClick={onSettings}
+                        />
+                        <Button
+                            type="default"
+                            icon={<LinkOutlined />}
+                            size={'middle'}
+                            onClick={onPagePreview}
                         />
                     </Space>
                 </div>

@@ -27,13 +27,6 @@ export type ICreateWebsite = {
     description?: string | null;
     templateId: number;
     userId: number;
-    data?: object | null;
-};
-
-export type IWebsite = ICreateWebsite & {
-    id: number;
-    template: ITemplate;
-    user: IUser;
     data: {
         [key: string]: any;
     };
@@ -42,6 +35,12 @@ export type IWebsite = ICreateWebsite & {
             [key: string]: any;
         };
     };
+};
+
+export type IWebsite = ICreateWebsite & {
+    id: number;
+    template: ITemplate;
+    user: IUser;
     createdAt: Date;
     updatedAt: Date | null;
     deletedAt: Date | null;

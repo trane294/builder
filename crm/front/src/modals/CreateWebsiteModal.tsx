@@ -59,6 +59,18 @@ const CreateWebsiteModal: React.FC = () => {
                     name: 'Website ' + formattedDateTime,
                     templateId: selectedTemplate.id,
                     userId: userInfo.id,
+                    data: {
+                        '/': { root: { props: {} }, content: [], zones: {} },
+                    },
+                    metadata: {
+                        pages: {
+                            '/': {
+                                title: '',
+                                description: '',
+                                ogImage: '',
+                            },
+                        },
+                    },
                 });
 
                 message.success('Website created');
