@@ -1,15 +1,14 @@
+import { useState } from 'react';
 import type { RootState } from 'src/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { decrement, increment } from 'src/features/counter/counterSlice';
 import { NavLink } from 'react-router';
 import { useGetWebsitesQuery } from 'src/services/website/websiteService';
 import { IWebsite } from 'src/types';
-import EntryModal from 'src/modals/EntryModal';
 import { openModal } from 'src/features/modal/modalSlice';
 import { Button, Card, List, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from 'src/hooks';
 import { CrownOutlined } from '@ant-design/icons';
+import { useAppSelector } from 'src/hooks';
 
 function Home() {
     const { t, i18n } = useTranslation();
@@ -43,12 +42,31 @@ function Home() {
         dispatch(openModal({ componentName: 'SubscriptionModal' }));
     };
 
+    const handleFormBuilderModal = () => {
+        dispatch(openModal({ componentName: 'FormBuilderModal' }));
+    };
+
+    // const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+    // const showModal = () => {
+    //     setIsModalVisible(true);
+    // };
+
+    // const handleCancel = () => {
+    //     setIsModalVisible(false);
+    // };
+
     if (isLoading) {
         return <div>Loading...</div>;
     }
 
     return (
         <>
+            {/* <FormBuilderModal
+                visible={isModalVisible}
+                onCancel={handleCancel}
+            />*/}
+            <button onClick={handleFormBuilderModal}>Show Modal</button>
             <div>
                 <h1>{t('welcome')}</h1>
                 <p>{t('description')}</p>

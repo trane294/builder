@@ -6,6 +6,7 @@ import { Modal as AntModal } from 'antd';
 import CreateWebsiteModal from 'src/modals/CreateWebsiteModal';
 import WebsiteSettingsModal from 'src/modals/WebsiteSettingsModal';
 import SubscriptionModal from 'src/modals/SubscriptionModal';
+import FormBuilderModal from 'src/modals/FormBuilderModal';
 
 const EntryModal: React.FC = () => {
     const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const EntryModal: React.FC = () => {
         CreateWebsiteModal: CreateWebsiteModal,
         WebsiteSettingsModal: WebsiteSettingsModal,
         SubscriptionModal: SubscriptionModal,
+        FormBuilderModal: FormBuilderModal,
     };
 
     const Modal = Modals[componentName];
