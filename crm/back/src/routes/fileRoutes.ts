@@ -7,7 +7,6 @@ import upload from "../controllers/filesController";
 
 const router: Router = express.Router();
 
-// Apply the upload middleware
 router.post(
     "/",
     authMiddleware,

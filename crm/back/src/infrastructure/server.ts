@@ -1,9 +1,10 @@
 import express from "express";
 import helmet from "helmet";
+import cors from 'cors';
 import userRoutes from "../routes/userRoutes";
 import websiteRoutes from "../routes/websiteRoutes";
 import fileRoutes from "../routes/fileRoutes";
-import cors from 'cors';
+import subscriptionRoutes from "../routes/subscriptionRoutes";
 
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -28,5 +29,7 @@ app.use(bodyParser.json());
 app.use("/api/user", userRoutes);
 app.use("/api/website", websiteRoutes);
 app.use("/api/file", fileRoutes);
+app.use("/api/subscription", subscriptionRoutes);
+
 
 export default app;

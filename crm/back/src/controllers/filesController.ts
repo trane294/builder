@@ -86,9 +86,17 @@ const upload = multer({ storage: storage });
  *                   type: string
  *                   example: No file uploaded
  *       401:
- *         $ref: '#/components/responses/Unauthorized'
+ *         description: Unauthorized - Missing token
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Unauthorized - Missing token
  *       500:
- *         $ref: '#/components/responses/InternalServerError'
+ *         description: Server error
  */
 export const uploadFile = async (
     req: AuthenticatedRequestWithFile,

@@ -1,6 +1,5 @@
 {
     "welcome": "Welcome to our app!",
     "description": "This is a multilingual application.",
-    "changeLanguage": "Change Language",
-    "hello": "Hello!"
+    "changeLanguage": "Change Language"
 }

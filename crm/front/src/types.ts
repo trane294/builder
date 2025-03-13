@@ -1,3 +1,13 @@
+export interface ISubscription {
+    permissions: {
+        canCreate: boolean;
+        canPublish: boolean;
+    };
+    publishLimit: number;
+    expiresAt?: string;
+    plan: string;
+}
+
 export interface IUser {
     id: number;
     firstName: string;
@@ -9,6 +19,7 @@ export interface IUser {
     updatedAt: Date | null;
     deletedAt: Date | null;
     websites: IWebsite[];
+    subscription: ISubscription;
 }
 
 export interface ITemplate {
@@ -41,6 +52,7 @@ export type IWebsite = ICreateWebsite & {
     id: number;
     template: ITemplate;
     user: IUser;
+    isPublished: boolean;
     createdAt: Date;
     updatedAt: Date | null;
     deletedAt: Date | null;

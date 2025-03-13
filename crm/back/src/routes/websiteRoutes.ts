@@ -1,4 +1,4 @@
-import express, { Router, NextFunction } from "express";
+import express, { Router, NextFunction, Response } from "express";
 import {
     createWebsite,
     updateWebsite,
@@ -10,7 +10,6 @@ import {
 import authMiddleware, {
     AuthenticatedRequest,
 } from "../middleware/authMiddleware";
-import { Response } from "express";
 
 const router: Router = express.Router();
 
