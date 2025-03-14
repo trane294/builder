@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/store';
 import { closeModal } from 'src/features/modal/modalSlice';
@@ -15,6 +15,7 @@ import {
     Form,
     Select,
     Switch,
+    message,
 } from 'antd';
 import {
     DragDropContext,
@@ -22,7 +23,13 @@ import {
     Droppable,
     DropResult,
 } from 'react-beautiful-dnd';
-import { DeleteOutlined, DragOutlined, EditOutlined } from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    DragOutlined,
+    EditOutlined,
+    PlusOutlined,
+} from '@ant-design/icons';
+import { v4 as uuidv4 } from 'uuid';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -42,9 +49,10 @@ interface FInputProps {
     item: FInputItem;
     index: number;
     onUpdate: (id: string, updatedItem: Partial<FInputItem>) => void;
+    onDelete: (id: string) => void;
 }
 
-const FInput: React.FC<FInputProps> = ({ item, index, onUpdate }) => {
+const FInput: React.FC<FInputProps> = ({ item, index, onUpdate, onDelete }) => {
     const [form] = Form.useForm();
     const [editOpen, setEditOpen] = useState(false);
 
@@ -52,7 +60,7 @@ const FInput: React.FC<FInputProps> = ({ item, index, onUpdate }) => {
         // Ensure isRequired is properly typed as a boolean
         const updatedValues = {
             ...values,
-            isRequired: Boolean(values.isRequired)
+            isRequired: Boolean(values.isRequired),
         };
         onUpdate(item.id, updatedValues);
         setEditOpen(false);
@@ -166,10 +174,7 @@ const FInput: React.FC<FInputProps> = ({ item, index, onUpdate }) => {
                             type="link"
                             danger
                             icon={<DeleteOutlined />}
-                            onClick={() => {
-                                // Implement later
-                                console.log('Delete clicked for:', item.label);
-                            }}
+                            onClick={() => onDelete(item.id)}
                         />
                     </Space>
                 </div>
@@ -182,11 +187,27 @@ const FormBuilderModal: React.FC = () => {
     const dispatch = useDispatch();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
 
-    const [formInputs, setFormInputs] = useState<FInputItem[]>([
+    // Default form input or use from props if provided
+    const initialFormInputs: FInputItem[] = props?.formFields || [
         { id: 'email', label: 'Email', type: 'email', isRequired: true },
         { id: 'name', label: 'Name', type: 'text', isRequired: true },
-        { id: 'message', label: 'Message', type: 'textarea', isRequired: false },
-    ]);
+        {
+            id: 'message',
+            label: 'Message',
+            type: 'textarea',
+            isRequired: false,
+        },
+    ];
+
+    const [formInputs, setFormInputs] =
+        useState<FInputItem[]>(initialFormInputs);
+
+    // Reset formInputs when modal opens with new props
+    useEffect(() => {
+        if (isOpen && props?.formFields) {
+            setFormInputs(props.formFields);
+        }
+    }, [isOpen, props]);
 
     const handleOnDragEnd = (result: DropResult) => {
         if (!result.destination) return;
@@ -209,6 +230,30 @@ const FormBuilderModal: React.FC = () => {
         );
     };
 
+    const handleDeleteInput = (id: string) => {
+        setFormInputs((prevInputs) =>
+            prevInputs.filter((input) => input.id !== id)
+        );
+    };
+
+    const handleAddField = () => {
+        const newField: FInputItem = {
+            id: uuidv4(),
+            label: 'New Field',
+            type: 'text',
+            isRequired: false,
+        };
+        setFormInputs([...formInputs, newField]);
+    };
+
+    const handleSaveForm = () => {
+        // if (props?.onSave) {
+        //     props.onSave(formInputs);
+        //     message.success('Form saved successfully');
+        // }
+        // dispatch(closeModal());
+    };
+
     const getFormPreview = () => {
         return (
             <div
@@ -222,7 +267,10 @@ const FormBuilderModal: React.FC = () => {
                 {formInputs.map((item, index) => (
                     <div key={item.id} style={{ marginBottom: '10px' }}>
                         <Text strong>
-                            {item.label}:{item.isRequired && <span style={{ color: 'red' }}> *</span>}
+                            {item.label}:
+                            {item.isRequired && (
+                                <span style={{ color: 'red' }}> *</span>
+                            )}
                         </Text>
                         {item.type === 'textarea' ? (
                             <Input.TextArea rows={3} disabled />
@@ -244,12 +292,7 @@ const FormBuilderModal: React.FC = () => {
                 <Button key="back" onClick={() => dispatch(closeModal())}>
                     Cancel
                 </Button>,
-                <Button
-                    key="submit"
-                    type="primary"
-                    form="myForm"
-                    htmlType="submit"
-                >
+                <Button key="submit" type="primary" onClick={handleSaveForm}>
                     Save
                 </Button>,
             ]}
@@ -257,6 +300,21 @@ const FormBuilderModal: React.FC = () => {
         >
             <Row gutter={16}>
                 <Col span={12}>
+                    <div
+                        style={{
+                            marginBottom: 16,
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                        }}
+                    >
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={handleAddField}
+                        >
+                            Add Field
+                        </Button>
+                    </div>
                     <DragDropContext onDragEnd={handleOnDragEnd}>
                         <Droppable droppableId="form-inputs">
                             {(provided) => (
@@ -270,6 +328,7 @@ const FormBuilderModal: React.FC = () => {
                                             item={item}
                                             index={index}
                                             onUpdate={handleUpdateInput}
+                                            onDelete={handleDeleteInput}
                                         />
                                     ))}
                                     {provided.placeholder}
@@ -278,7 +337,10 @@ const FormBuilderModal: React.FC = () => {
                         </Droppable>
                     </DragDropContext>
                 </Col>
-                <Col span={12}>{getFormPreview()}</Col>
+                <Col span={12}>
+                    <h4>Form Preview</h4>
+                    {getFormPreview()}
+                </Col>
             </Row>
         </AntModal>
     );

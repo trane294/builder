@@ -1,4 +1,4 @@
-import { Config, FieldProps } from '@measured/puck';
+import { Button, Config, FieldProps } from '@measured/puck';
 import ImageUploader from 'src/components/editor/ImageUploader';
 import { useAppSelector } from 'src/hooks';
 import FooterPhoto1 from 'src/templates/photo-1/footer';
@@ -6,6 +6,9 @@ import HeroPhoto1 from 'src/templates/photo-1/hero';
 import LayoutPhoto1 from 'src/templates/photo-1/layout';
 import MenuPhoto1 from 'src/templates/photo-1/menu';
 import SectionPhoto1 from 'src/templates/photo-1/section';
+import FormPhoto1, { FormField } from 'src/templates/photo-1/form';
+import { openModal } from 'src/features/modal/modalSlice';
+import { useDispatch } from 'react-redux';
 
 export type Components = {
     HeroPhoto1: {
@@ -24,6 +27,11 @@ export type Components = {
     };
     FooterPhoto1: {
         children: string;
+    };
+    FormPhoto1: {
+        formId?: string;
+        formFields?: FormField[];
+        submitButtonText?: string;
     };
 };
 
@@ -62,7 +70,11 @@ export const photo1Config = (
             render: ({ title, name, imageUrl }) => {
                 return (
                     <>
-                        <HeroPhoto1 title={title} name={name} imageUrl={imageUrl}></HeroPhoto1>
+                        <HeroPhoto1
+                            title={title}
+                            name={name}
+                            imageUrl={imageUrl}
+                        ></HeroPhoto1>
                     </>
                 );
             },
@@ -106,6 +118,84 @@ export const photo1Config = (
                     <>
                         <FooterPhoto1></FooterPhoto1>
                     </>
+                );
+            },
+        },
+        FormPhoto1: {
+            fields: {
+                formId: {
+                    type: 'text',
+                    label: 'Form ID',
+                },
+                submitButtonText: {
+                    type: 'text',
+                    label: 'Submit Button Text',
+                },
+                formFields: {
+                    type: 'custom',
+                    label: 'Form Fields',
+                    render: ({ field, value, onChange }: FieldProps) => {
+                        const dispatch = useDispatch();
+
+                        const handleOpenFormBuilder = () => {
+                            dispatch(
+                                openModal({
+                                    componentName: 'FormBuilderModal',
+                                    props: {
+                                        formFields: value || [
+                                            {
+                                                id: 'email',
+                                                label: 'Email',
+                                                type: 'email',
+                                                isRequired: true,
+                                            },
+                                        ],
+                                    },
+                                })
+                            );
+                        };
+
+                        return (
+                            <div>
+                                <Button onClick={handleOpenFormBuilder}>
+                                    Configure Form Fields
+                                </Button>
+                                {value && value.length > 0 && (
+                                    <div style={{ marginTop: 10 }}>
+                                        <p>Fields: {value.length}</p>
+                                        <ul>
+                                            {value.map((field: FormField) => (
+                                                <li key={field.id}>
+                                                    {field.label} ({field.type})
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    },
+                },
+            },
+            defaultProps: {
+                formId: 'contact-form',
+                submitButtonText: 'Submit',
+                formFields: [
+                    {
+                        id: 'email',
+                        label: 'Email',
+                        type: 'email',
+                        isRequired: true,
+                    },
+                ],
+            },
+            render: ({ formId, formFields, submitButtonText }) => {
+                return (
+                    <FormPhoto1
+                        formId={formId}
+                        formFields={formFields}
+                        submitButtonText={submitButtonText}
+                    />
                 );
             },
         },
