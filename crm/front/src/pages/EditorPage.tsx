@@ -26,6 +26,7 @@ import EditorHeader from 'src/components/editor/EditorHeader';
 import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 import AddPageModal from 'src/modals/AddPageModal';
 import { isEqual } from 'src/utils';
+import { useWebsiteSettingsModal } from 'src/modals/WebsiteSettingsModal';
 
 type EditorPageProps = {};
 
@@ -43,6 +44,7 @@ export default function EditorPage(props: EditorPageProps) {
     const puckAppStateRef = useRef<AppState | null>(null);
     const puckDispatchRef = useRef<((action: PuckAction) => void) | null>(null);
     const [_, forceUpdate] = useReducer((x) => x + 1, 0);
+    const openWebsiteSettingsModal = useWebsiteSettingsModal();
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -163,12 +165,7 @@ export default function EditorPage(props: EditorPageProps) {
     };
 
     const handleSettings = () => {
-        dispatch(
-            openModal({
-                componentName: 'WebsiteSettingsModal',
-                props: { website },
-            })
-        );
+        openWebsiteSettingsModal();
     };
 
     const handlePageSelect = async (page: string) => {

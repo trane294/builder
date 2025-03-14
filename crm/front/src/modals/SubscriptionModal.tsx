@@ -13,18 +13,39 @@ import {
     message,
 } from 'antd';
 import { CheckOutlined, CrownOutlined } from '@ant-design/icons';
-import { closeModal } from 'src/features/modal/modalSlice';
-import { useAppSelector } from 'src/hooks';
+import { closeModal, openModal } from 'src/features/modal/modalSlice';
+import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { useUpgradeSubscriptionMutation } from 'src/services/subscription/subscriptionService';
 
 const { Title, Text, Paragraph } = Typography;
 
-const SubscriptionModal: React.FC = () => {
-    const dispatch = useDispatch();
+export const useSubscriptionModal = () => {
+    const dispatch = useAppDispatch();
+
+    const openSubscriptionModal = () => {
+        dispatch(
+            openModal({
+                modalTitle: 'Upgrade Your Subscription',
+                componentName: 'SubscriptionModal',
+            })
+        );
+    };
+
+    return openSubscriptionModal;
+};
+
+interface SubscriptionModalProps {
+    onComplete: (result?: any) => void;
+}
+
+const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
+    onComplete,
+}) => {
     const [selectedPlan, setSelectedPlan] = useState<string>('pro');
     const [loading, setLoading] = useState(false);
     const { userInfo } = useAppSelector((state) => state.auth);
-    const [upgradeSubscription, { isLoading }] = useUpgradeSubscriptionMutation();
+    const [upgradeSubscription, { isLoading }] =
+        useUpgradeSubscriptionMutation();
 
     const currentPlan = userInfo?.subscription?.plan || 'free';
 
@@ -74,33 +95,17 @@ const SubscriptionModal: React.FC = () => {
                 window.location.href = result.paymentUrl;
             } else if (result?.success) {
                 message.success('Subscription updated successfully!');
-                dispatch(closeModal());
             }
         } catch (error) {
             message.error('Failed to process subscription');
             setLoading(false);
+        } finally {
+            onComplete();
         }
     };
 
     return (
-        <Modal
-            title={
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <CrownOutlined
-                        style={{
-                            color: '#faad14',
-                            fontSize: 24,
-                            marginRight: 8,
-                        }}
-                    />
-                    <span>Upgrade Your Subscription</span>
-                </div>
-            }
-            open={true}
-            onCancel={() => dispatch(closeModal())}
-            footer={null}
-            width={700}
-        >
+        <>
             <Paragraph>
                 Choose the right plan to grow your online presence. You're
                 currently on the{' '}
@@ -213,7 +218,7 @@ const SubscriptionModal: React.FC = () => {
                         : 'Update Subscription'}
                 </Button>
             </div>
-        </Modal>
+        </>
     );
 };
 

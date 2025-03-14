@@ -10,14 +10,13 @@ import FormBuilderModal from 'src/modals/FormBuilderModal';
 
 const EntryModal: React.FC = () => {
     const dispatch = useDispatch();
-    const { isOpen, componentName, props } = useSelector(
-        (state: RootState) => state.modal
-    );
+    const { isOpen, modalTitle, componentName, modalWidth, props } =
+        useSelector((state: RootState) => state.modal);
 
     if (!componentName) return null;
 
     const Modals: {
-        [key in string]: React.FC;
+        [key in string]: React.FC<any>;
     } = {
         CreateWebsiteModal: CreateWebsiteModal,
         WebsiteSettingsModal: WebsiteSettingsModal,
@@ -27,7 +26,21 @@ const EntryModal: React.FC = () => {
 
     const Modal = Modals[componentName];
 
-    return <Modal />;
+    const handleClose = (result?: any) => {
+        dispatch(closeModal(result));
+    };
+
+    return (
+        <AntModal
+            title={modalTitle || 'Modal'}
+            open={isOpen}
+            onCancel={() => handleClose()}
+            footer={null}
+            width={modalWidth || 700}
+        >
+            <Modal {...props} onComplete={handleClose} />
+        </AntModal>
+    );
 };
 
 export default EntryModal;

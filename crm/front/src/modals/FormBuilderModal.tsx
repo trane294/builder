@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/store';
-import { closeModal } from 'src/features/modal/modalSlice';
+import { closeModal, openModal } from 'src/features/modal/modalSlice';
 import {
     Modal as AntModal,
     Button,
@@ -30,6 +30,7 @@ import {
     PlusOutlined,
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
+import { useAppDispatch } from 'src/hooks';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -183,7 +184,27 @@ const FInput: React.FC<FInputProps> = ({ item, index, onUpdate, onDelete }) => {
     );
 };
 
-const FormBuilderModal: React.FC = () => {
+export const useFormBuilderModal = () => {
+    const dispatch = useAppDispatch();
+
+    const openFormBuilderModal = () => {
+        dispatch(
+            openModal({
+                modalTitle: 'Form Builder',
+                modalWidth: 1000,
+                componentName: 'FormBuilderModal',
+            })
+        );
+    };
+
+    return openFormBuilderModal;
+};
+
+interface FormBuilderModalProps {
+    onComplete: (result?: any) => void;
+}
+
+const FormBuilderModal: React.FC<FormBuilderModalProps> = ({ onComplete }) => {
     const dispatch = useDispatch();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
 
@@ -284,65 +305,50 @@ const FormBuilderModal: React.FC = () => {
     };
 
     return (
-        <AntModal
-            title="Form Builder"
-            open={isOpen}
-            onCancel={() => dispatch(closeModal())}
-            footer={[
-                <Button key="back" onClick={() => dispatch(closeModal())}>
-                    Cancel
-                </Button>,
-                <Button key="submit" type="primary" onClick={handleSaveForm}>
-                    Save
-                </Button>,
-            ]}
-            width={1000}
-        >
-            <Row gutter={16}>
-                <Col span={12}>
-                    <div
-                        style={{
-                            marginBottom: 16,
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                        }}
+        <Row gutter={16}>
+            <Col span={12}>
+                <div
+                    style={{
+                        marginBottom: 16,
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                    }}
+                >
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={handleAddField}
                     >
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={handleAddField}
-                        >
-                            Add Field
-                        </Button>
-                    </div>
-                    <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="form-inputs">
-                            {(provided) => (
-                                <div
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                >
-                                    {formInputs.map((item, index) => (
-                                        <FInput
-                                            key={item.id}
-                                            item={item}
-                                            index={index}
-                                            onUpdate={handleUpdateInput}
-                                            onDelete={handleDeleteInput}
-                                        />
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
-                </Col>
-                <Col span={12}>
-                    <h4>Form Preview</h4>
-                    {getFormPreview()}
-                </Col>
-            </Row>
-        </AntModal>
+                        Add Field
+                    </Button>
+                </div>
+                <DragDropContext onDragEnd={handleOnDragEnd}>
+                    <Droppable droppableId="form-inputs">
+                        {(provided) => (
+                            <div
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                            >
+                                {formInputs.map((item, index) => (
+                                    <FInput
+                                        key={item.id}
+                                        item={item}
+                                        index={index}
+                                        onUpdate={handleUpdateInput}
+                                        onDelete={handleDeleteInput}
+                                    />
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+            </Col>
+            <Col span={12}>
+                <h4>Form Preview</h4>
+                {getFormPreview()}
+            </Col>
+        </Row>
     );
 };
 

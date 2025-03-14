@@ -1,35 +1,29 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from 'src/store';
-import { closeModal } from 'src/features/modal/modalSlice';
-import { Modal as AntModal, Button } from 'antd';
+import { openModal } from 'src/features/modal/modalSlice';
+import { useAppDispatch } from 'src/hooks';
 
-const SampleModal: React.FC = () => {
-    const dispatch = useDispatch();
-    const { isOpen, props } = useSelector((state: RootState) => state.modal);
+export const useSampleModal = () => {
+    const dispatch = useAppDispatch();
 
-    return (
-        <AntModal
-            title="Website Settings"
-            open={isOpen}
-            onCancel={() => dispatch(closeModal())}
-            footer={[
-                <Button key="back" onClick={() => dispatch(closeModal())}>
-                    Cancel
-                </Button>,
-                <Button
-                    key="submit"
-                    type="primary"
-                    form="myForm"
-                    htmlType="submit"
-                >
-                    Save
-                </Button>,
-            ]}
-        >
-            Sample Modal
-        </AntModal>
-    );
+    const openSampleModal = () => {
+        dispatch(
+            openModal({
+                modalTitle: 'Form Builder',
+                modalWidth: 1000,
+                componentName: 'SampleModal',
+            })
+        );
+    };
+
+    return openSampleModal;
+};
+
+interface SampleModalProps {
+    onComplete: (result?: any) => void;
+}
+
+const SampleModal: React.FC<SampleModalProps> = ({ onComplete }) => {
+    return <div>Sample Modal</div>;
 };
 
 export default SampleModal;

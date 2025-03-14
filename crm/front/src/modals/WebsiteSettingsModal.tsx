@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from 'src/store';
-import { closeModal } from 'src/features/modal/modalSlice';
 import {
-    Modal as AntModal,
     Button,
     Form,
     FormProps,
     Input,
     message,
 } from 'antd';
-import { useAppSelector } from 'src/hooks';
+import { useAppDispatch, useAppSelector } from 'src/hooks';
 import {
     useDeleteWebsiteMutation,
     useGetWebsitesQuery,
@@ -22,12 +20,34 @@ import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
 import WebsiteMetadata from 'src/components/editor/WebsiteMetadata';
 import { useSubPath } from 'src/hooks/useSubPath';
 import cloneDeep from 'lodash.clonedeep';
+import { openModal } from 'src/features/modal/modalSlice';
 
 type FieldType = {
     name?: string;
 };
 
-const WebsiteSettingsModal: React.FC = () => {
+export const useWebsiteSettingsModal = () => {
+    const dispatch = useAppDispatch();
+
+    const openWebsiteSettingsModal = () => {
+        dispatch(
+            openModal({
+                modalTitle: 'Website Settings',
+                componentName: 'WebsiteSettingsModal',
+            })
+        );
+    };
+
+    return openWebsiteSettingsModal;
+};
+
+interface WebsiteSettingsModalProps {
+    onComplete: (result?: any) => void;
+}
+
+const WebsiteSettingsModal: React.FC<WebsiteSettingsModalProps> = ({
+    onComplete,
+}) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { isOpen, props } = useSelector((state: RootState) => state.modal);
@@ -94,7 +114,6 @@ const WebsiteSettingsModal: React.FC = () => {
         try {
             await deleteWebsite(props.website.id);
             await refetchWebsites();
-            dispatch(closeModal());
             navigate('/');
             message.success('Website deleted successfully!');
         } catch (err: any) {
@@ -102,29 +121,13 @@ const WebsiteSettingsModal: React.FC = () => {
                 `Failed to delete website: ${err.data?.message || err.message}`
             );
             console.error('Error delete website:', err);
+        } finally {
+            onComplete();
         }
     };
 
     return (
-        <AntModal
-            title="Website Settings"
-            open={isOpen}
-            onCancel={() => dispatch(closeModal())}
-            footer={[
-                <Button key="back" onClick={() => dispatch(closeModal())}>
-                    Cancel
-                </Button>,
-                <Button
-                    key="submit"
-                    type="primary"
-                    form="myForm"
-                    htmlType="submit"
-                    loading={isLoading}
-                >
-                    Save
-                </Button>,
-            ]}
-        >
+        <>
             <Form
                 id="myForm"
                 name="basic"
@@ -150,7 +153,10 @@ const WebsiteSettingsModal: React.FC = () => {
                 </Form.Item>
             </Form>
 
-            <WebsiteMetadata metadata={localMetadata} onChange={setLocalMetadata} />
+            <WebsiteMetadata
+                metadata={localMetadata}
+                onChange={setLocalMetadata}
+            />
 
             <DeleteConfirmation
                 key="delete-confirmation"
@@ -161,7 +167,7 @@ const WebsiteSettingsModal: React.FC = () => {
                     Delete
                 </Button>
             </DeleteConfirmation>
-        </AntModal>
+        </>
     );
 };
 
