@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface ModalState {
     isOpen: boolean;
     modalTitle: string;
-    modalWidth?: number;
+    modalWidth: number;
     componentName: string | null;
     props: any;
     onComplete?: (result?: any) => void;
@@ -26,7 +26,7 @@ const modalSlice = createSlice({
             state,
             action: PayloadAction<{
                 modalTitle: string;
-                modalWidth?: number;
+                modalWidth: number;
                 componentName: string;
                 props?: any;
                 onComplete?: (result?: any) => void;

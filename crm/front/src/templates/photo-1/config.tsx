@@ -138,21 +138,21 @@ export const photo1Config = (
                         const dispatch = useDispatch();
 
                         const handleOpenFormBuilder = () => {
-                            dispatch(
-                                openModal({
-                                    componentName: 'FormBuilderModal',
-                                    props: {
-                                        formFields: value || [
-                                            {
-                                                id: 'email',
-                                                label: 'Email',
-                                                type: 'email',
-                                                isRequired: true,
-                                            },
-                                        ],
-                                    },
-                                })
-                            );
+                            // dispatch(
+                            //     openModal({
+                            //         componentName: 'FormBuilderModal',
+                            //         props: {
+                            //             formFields: value || [
+                            //                 {
+                            //                     id: 'email',
+                            //                     label: 'Email',
+                            //                     type: 'email',
+                            //                     isRequired: true,
+                            //                 },
+                            //             ],
+                            //         },
+                            //     })
+                            // );
                         };
 
                         return (

@@ -22,7 +22,7 @@ import {
     Draggable,
     Droppable,
     DropResult,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 import {
     DeleteOutlined,
     DragOutlined,
