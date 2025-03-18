@@ -29,6 +29,7 @@ const FormPhoto1: React.FC<FormPhoto1Props> = ({
 
     const handleSubmit = (values: any) => {
         if (onSubmit) {
+            console.log('Form submitted:', values);
             onSubmit(values);
         } else {
             console.log('Form submitted:', values);
@@ -78,7 +79,7 @@ const FormPhoto1: React.FC<FormPhoto1Props> = ({
                             ...(field.type === 'email'
                                 ? [
                                       {
-                                          type: 'email' as const, // Use 'as const' to narrow the type
+                                          type: 'email' as const,
                                           message: 'Please enter a valid email',
                                       } as Rule,
                                   ]

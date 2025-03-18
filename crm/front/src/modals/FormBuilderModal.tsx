@@ -223,7 +223,6 @@ const FormBuilderModal: React.FC<FormBuilderModalProps> = ({ onComplete }) => {
     const [formInputs, setFormInputs] =
         useState<FInputItem[]>(initialFormInputs);
 
-    // Reset formInputs when modal opens with new props
     useEffect(() => {
         if (isOpen && props?.formFields) {
             setFormInputs(props.formFields);

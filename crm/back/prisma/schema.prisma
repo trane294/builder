@@ -47,6 +47,7 @@ model User {
     updatedAt    DateTime? @updatedAt @db.Timestamptz(6)
     deletedAt    DateTime? @db.Timestamptz(6)
     websites     Website[]
+    Cms          Cms[]
 }
 
 model Template {
@@ -68,6 +69,33 @@ model Website {
     template    Template  @relation(fields: [templateId], references: [id])
     userId      Int
     user        User      @relation(fields: [userId], references: [id])
+    data        Json?
+    metadata    Json?
+    createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+    deletedAt   DateTime? @db.Timestamptz(6)
+    Cms          Cms[]
+}
+
+model Cms {
+    id          Int       @id @default(autoincrement())
+    type        String    @db.VarChar(255)
+    wesiteId    Int
+    wesite      Website   @relation(fields: [wesiteId], references: [id])
+    userId      Int
+    user        User      @relation(fields: [userId], references: [id])
+    data        Json?
+    metadata    Json?
+    createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+    deletedAt   DateTime? @db.Timestamptz(6)
+    CmsEntry    CmsEntry[]
+}
+
+model CmsEntry {
+    id          Int       @id @default(autoincrement())
+    cmsId       Int
+    cms         Cms       @relation(fields: [cmsId], references: [id])
     data        Json?
     metadata    Json?
     createdAt   DateTime  @default(now()) @db.Timestamptz(6)
