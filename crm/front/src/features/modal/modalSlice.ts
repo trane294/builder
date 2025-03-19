@@ -1,55 +1,43 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface ModalState {
-    isOpen: boolean;
-    modalTitle: string;
-    modalWidth: number;
-    componentName: string | null;
-    props: any;
-    onComplete?: (result?: any) => void;
-}
+export type ModalNamesType =
+    'CreateWebsiteModal' |
+    'WebsiteSettingsModal' |
+    'SubscriptionModal' |
+    'FormBuilderModal' |
+    'AddPageModal' |
+    'SampleModal';
 
-const initialState: ModalState = {
-    isOpen: false,
-    modalTitle: 'Modal',
-    modalWidth: 700,
-    componentName: null,
-    props: {},
-    onComplete: undefined,
+const initialState: any = {};
+
+type ModalType = {
+    id: string;
+    modal: ModalNamesType;
+    props?: any;
 };
 
-const modalSlice = createSlice({
-    name: 'modal',
+const modalsSlice = createSlice({
+    name: 'modals',
     initialState,
     reducers: {
-        openModal: (
-            state,
-            action: PayloadAction<{
-                modalTitle: string;
-                modalWidth: number;
-                componentName: string;
-                props?: any;
-                onComplete?: (result?: any) => void;
-            }>
-        ) => {
-            state.isOpen = true;
-            state.modalTitle = action.payload.modalTitle;
-            state.modalWidth = action.payload.modalWidth;
-            state.componentName = action.payload.componentName;
-            state.props = action.payload.props || {};
-            state.onComplete = action.payload.onComplete;
-        },
-        closeModal: (state, action: PayloadAction<any>) => {
-            if (state.onComplete) {
-                state.onComplete(action.payload);
-            }
+        openModal: (state: any, action: { payload: ModalType }) => {
+            const modal = action.payload.modal;
+            const props = action.payload.props;
+            const id = action.payload.id;
+            if (!props) return;
 
-            state.isOpen = false;
-            state.componentName = null;
-            state.props = {};
+            state[modal] = state[modal] || {};
+            state[modal][id] = {
+                ...props,
+            };
+        },
+        closeModal: (state: any, action: { payload: ModalType }) => {
+            const modal = action.payload.modal;
+            const id = action.payload.id;
+            delete state[modal][id];
         },
     },
 });
 
-export const { openModal, closeModal } = modalSlice.actions;
-export default modalSlice.reducer;
+export const { openModal, closeModal } = modalsSlice.actions;
+export default modalsSlice.reducer;

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DateTime } from 'luxon';
-import { Card, Row, Col, message } from 'antd';
+import { Card, Row, Col, message, Modal } from 'antd';
 import {
     useCreateWebsiteMutation,
     useGetWebsitesQuery,
@@ -8,37 +8,32 @@ import {
 } from 'src/services/website/websiteService';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { ITemplate } from 'src/types';
-import { openModal } from 'src/features/modal/modalSlice';
 import ModalFooter from './ModalFooter';
+import { ModalProps } from './EntryModal';
+import { closeModal } from 'src/features/modal/modalSlice';
 
 const activeCardStyle = {
     boxShadow:
         '0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09)',
 };
 
-export const useCreateWebsiteModal = () => {
+const CreateWebsiteModal = (ModalProps: ModalProps) => {
+    const { id, zIndex, props, callbacks } = ModalProps;
+    const { userInfo } = useAppSelector((state) => state.auth);
+    const [isOpen, setIsOpen] = useState(false);
     const dispatch = useAppDispatch();
 
-    const openCreateWebsiteModal = () => {
-        dispatch(
-            openModal({
-                modalTitle: 'Create Website',
-                componentName: 'CreateWebsiteModal',
-            })
-        );
+    useEffect(() => {
+        if (props && !isOpen) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [props]);
+
+    const handleCloseModal = () => {
+        dispatch(closeModal({ modal: 'CreateWebsiteModal', id }));
     };
-
-    return openCreateWebsiteModal;
-};
-
-interface CreateWebsiteModalProps {
-    onComplete: (result?: any) => void;
-}
-
-const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
-    onComplete,
-}) => {
-    const { userInfo } = useAppSelector((state) => state.auth);
 
     if (!userInfo) return null;
 
@@ -92,7 +87,7 @@ const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
                 );
                 console.error('Error creating website:', err);
             } finally {
-                onComplete();
+                callbacks.onComplete();
             }
         } else {
             message.info('Please select template');
@@ -104,7 +99,14 @@ const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
     }
 
     return (
-        <>
+        <Modal
+            title={props.modalTitle || 'Modal'}
+            open={isOpen}
+            onCancel={handleCloseModal}
+            footer={null}
+            width={props.modalWidth || 700}
+            zIndex={zIndex}
+        >
             <Row gutter={[16, 16]}>
                 {templates.map((template, key) => (
                     <Col xs={24} sm={12} md={8} lg={6} key={key}>
@@ -127,9 +129,9 @@ const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
             <ModalFooter
                 onConfirm={handleCreateWebsite}
                 confirmLoading={isLoadingC}
-                onCancel={() => onComplete(undefined)}
+                onCancel={handleCloseModal}
             />
-        </>
+        </Modal>
     );
 };
 

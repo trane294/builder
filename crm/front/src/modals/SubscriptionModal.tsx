@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import {
     Modal,
     Button,
@@ -16,31 +15,27 @@ import { CheckOutlined, CrownOutlined } from '@ant-design/icons';
 import { closeModal, openModal } from 'src/features/modal/modalSlice';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { useUpgradeSubscriptionMutation } from 'src/services/subscription/subscriptionService';
+import { ModalProps } from './EntryModal';
 
 const { Title, Text, Paragraph } = Typography;
 
-export const useSubscriptionModal = () => {
+const SubscriptionModal = (ModalProps: ModalProps) => {
+    const { id, zIndex, props, callbacks } = ModalProps;
     const dispatch = useAppDispatch();
+    const [isOpen, setIsOpen] = useState(false);
+    useEffect(() => {
+        if (props && !isOpen) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [props]);
 
-    const openSubscriptionModal = () => {
-        dispatch(
-            openModal({
-                modalTitle: 'Upgrade Your Subscription',
-                componentName: 'SubscriptionModal',
-            })
-        );
+    const handleCloseModal = () => {
+        callbacks?.onClose();
+        dispatch(closeModal({ modal: 'SubscriptionModal', id }));
     };
 
-    return openSubscriptionModal;
-};
-
-interface SubscriptionModalProps {
-    onComplete: (result?: any) => void;
-}
-
-const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
-    onComplete,
-}) => {
     const [selectedPlan, setSelectedPlan] = useState<string>('pro');
     const [loading, setLoading] = useState(false);
     const { userInfo } = useAppSelector((state) => state.auth);
@@ -100,12 +95,18 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             message.error('Failed to process subscription');
             setLoading(false);
         } finally {
-            onComplete();
+            callbacks?.onComplete();
         }
     };
 
     return (
-        <>
+        <Modal
+            title={props.modalTitle || 'Modal'}
+            open={isOpen}
+            onCancel={handleCloseModal}
+            footer={null}
+            width={props.modalWidth || 1000}
+        >
             <Paragraph>
                 Choose the right plan to grow your online presence. You're
                 currently on the{' '}
@@ -218,7 +219,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                         : 'Update Subscription'}
                 </Button>
             </div>
-        </>
+        </Modal>
     );
 };
 

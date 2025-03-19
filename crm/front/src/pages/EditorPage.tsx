@@ -26,7 +26,7 @@ import EditorHeader from 'src/components/editor/EditorHeader';
 import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 import AddPageModal from 'src/modals/AddPageModal';
 import { isEqual } from 'src/utils';
-import { useWebsiteSettingsModal } from 'src/modals/WebsiteSettingsModal';
+import { useModal } from 'src/hooks/useModal';
 
 type EditorPageProps = {};
 
@@ -44,7 +44,7 @@ export default function EditorPage(props: EditorPageProps) {
     const puckAppStateRef = useRef<AppState | null>(null);
     const puckDispatchRef = useRef<((action: PuckAction) => void) | null>(null);
     const [_, forceUpdate] = useReducer((x) => x + 1, 0);
-    const openWebsiteSettingsModal = useWebsiteSettingsModal();
+    const { openModal: openWebsiteSettingsModal } = useModal();
 
     if (!websiteId) {
         return <Navigate to="/" replace />;
@@ -165,7 +165,17 @@ export default function EditorPage(props: EditorPageProps) {
     };
 
     const handleSettings = () => {
-        openWebsiteSettingsModal();
+        openWebsiteSettingsModal('WebsiteSettingsModal',
+            {
+                modalTitle: 'Website Settings',
+                componentName: 'WebsiteSettingsModal',
+            },
+            {
+                onComplete: () => {
+                    console.log('onComplete');
+                },
+            }
+        );
     };
 
     const handlePageSelect = async (page: string) => {
@@ -269,11 +279,6 @@ export default function EditorPage(props: EditorPageProps) {
 
     return (
         <>
-            <AddPageModal
-                isOpen={isAddPageModalOpen}
-                onClose={() => setIsAddPageModalOpen(false)}
-                onAddPage={handleAddNewPage}
-            />
             <Puck
                 config={config}
                 data={puckData}

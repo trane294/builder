@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
+import { ModalProps } from './EntryModal';
+import { closeModal } from 'src/features/modal/modalSlice';
+import { useAppDispatch } from 'src/hooks';
 
 interface AddPageModalProps {
     isOpen: boolean;
@@ -7,13 +10,25 @@ interface AddPageModalProps {
     onAddPage: (path: string) => void;
 }
 
-const AddPageModal: React.FC<AddPageModalProps> = ({
-    isOpen,
-    onClose,
-    onAddPage,
-}) => {
+const AddPageModal = (ModalProps: ModalProps) => {
+    const { id, zIndex, props, callbacks } = ModalProps;
+    const dispatch = useAppDispatch();
     const [form] = Form.useForm();
     const [isAdding, setIsAdding] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (props && !isOpen) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [props]);
+
+    const handleCloseModal = () => {
+        callbacks?.onClose();
+        dispatch(closeModal({ modal: 'AddPageModal', id }));
+    };
 
     const handleAddPage = async () => {
         try {
@@ -36,9 +51,9 @@ const AddPageModal: React.FC<AddPageModalProps> = ({
                 return;
             }
 
-            onAddPage(path);
+            callbacks.onAddPage(path);
             form.resetFields();
-            onClose();
+            handleCloseModal();
             setIsAdding(false);
         } catch (error) {
             setIsAdding(false);
@@ -47,11 +62,12 @@ const AddPageModal: React.FC<AddPageModalProps> = ({
 
     return (
         <Modal
+            zIndex={zIndex}
             title="Add New Page"
             open={isOpen}
-            onCancel={onClose}
+            onCancel={handleCloseModal}
             footer={[
-                <Button key="cancel" onClick={onClose}>
+                <Button key="cancel" onClick={handleCloseModal}>
                     Cancel
                 </Button>,
                 <Button

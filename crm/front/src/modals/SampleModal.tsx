@@ -1,29 +1,22 @@
-import React from 'react';
-import { openModal } from 'src/features/modal/modalSlice';
-import { useAppDispatch } from 'src/hooks';
+import { ModalProps } from './EntryModal';
+import { Modal } from 'antd';
 
-export const useSampleModal = () => {
-    const dispatch = useAppDispatch();
+const SampleModal = (ModalProps: ModalProps) => {
+    const { id, zIndex, props, callbacks } = ModalProps;
+    const { isOpen } = props;
 
-    const openSampleModal = () => {
-        dispatch(
-            openModal({
-                modalTitle: 'Form Builder',
-                modalWidth: 1000,
-                componentName: 'SampleModal',
-            })
-        );
-    };
-
-    return openSampleModal;
-};
-
-interface SampleModalProps {
-    onComplete: (result?: any) => void;
-}
-
-const SampleModal: React.FC<SampleModalProps> = ({ onComplete }) => {
-    return <div>Sample Modal</div>;
+    return (
+        <Modal
+            title={props.modalTitle || 'Modal'}
+            open={isOpen}
+            onCancel={() => callbacks.handleClose()}
+            footer={null}
+            width={props.modalWidth || 1000}
+            zIndex={zIndex}
+        >
+            <div>Sample Modal</div>
+        </Modal>
+    );
 };
 
 export default SampleModal;

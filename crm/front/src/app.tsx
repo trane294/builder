@@ -15,6 +15,7 @@ import { setUserDetails } from 'src/features/auth/authSlice';
 import { useEffect } from 'react';
 import EntryModal from './modals/EntryModal';
 import SettingsPage from './pages/Settings';
+import ModalProvider from './providers/ModalContextProvider';
 
 const App = () => {
     const dispatch = useAppDispatch();
@@ -32,9 +33,10 @@ const App = () => {
 
     return (
         <>
-            <Routes>
-                <Route element={<AuthLayout />}>
-                    <Route path="/login" element={<Login />} />
+            <ModalProvider>
+                <Routes>
+                    <Route element={<AuthLayout />}>
+                        <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                 </Route>
 
@@ -56,8 +58,9 @@ const App = () => {
                         <Route path=":id/*" element={<EditorPreviewPage />} />
                     </Route>
                 </Route>
-            </Routes>
-            <EntryModal />
+                </Routes>
+                <EntryModal />
+            </ModalProvider>
         </>
     );
 };

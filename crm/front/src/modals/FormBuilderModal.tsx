@@ -16,6 +16,7 @@ import {
     Select,
     Switch,
     message,
+    Modal,
 } from 'antd';
 import {
     DragDropContext,
@@ -31,6 +32,7 @@ import {
 } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppDispatch } from 'src/hooks';
+import { ModalProps } from './EntryModal';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -184,29 +186,22 @@ const FInput: React.FC<FInputProps> = ({ item, index, onUpdate, onDelete }) => {
     );
 };
 
-export const useFormBuilderModal = () => {
+const FormBuilderModal = (ModalProps: ModalProps) => {
     const dispatch = useAppDispatch();
+    const { id, zIndex, props, callbacks } = ModalProps;
+    const [isOpen, setIsOpen] = useState(false);
 
-    const openFormBuilderModal = () => {
-        dispatch(
-            openModal({
-                modalTitle: 'Form Builder',
-                modalWidth: 1000,
-                componentName: 'FormBuilderModal',
-            })
-        );
+    useEffect(() => {
+        if (props && !isOpen) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [props]);
+
+    const handleCloseModal = () => {
+        dispatch(closeModal({ modal: 'FormBuilderModal', id }));
     };
-
-    return openFormBuilderModal;
-};
-
-interface FormBuilderModalProps {
-    onComplete: (result?: any) => void;
-}
-
-const FormBuilderModal: React.FC<FormBuilderModalProps> = ({ onComplete }) => {
-    const dispatch = useDispatch();
-    const { isOpen, props } = useSelector((state: RootState) => state.modal);
 
     // Default form input or use from props if provided
     const initialFormInputs: FInputItem[] = props?.formFields || [
@@ -267,11 +262,11 @@ const FormBuilderModal: React.FC<FormBuilderModalProps> = ({ onComplete }) => {
     };
 
     const handleSaveForm = () => {
-        // if (props?.onSave) {
-        //     props.onSave(formInputs);
-        //     message.success('Form saved successfully');
-        // }
-        // dispatch(closeModal());
+        if (callbacks?.onSave) {
+            callbacks.onSave(formInputs);
+            message.success('Form saved successfully');
+        }
+        handleCloseModal();
     };
 
     const getFormPreview = () => {
@@ -304,50 +299,59 @@ const FormBuilderModal: React.FC<FormBuilderModalProps> = ({ onComplete }) => {
     };
 
     return (
-        <Row gutter={16}>
-            <Col span={12}>
-                <div
-                    style={{
-                        marginBottom: 16,
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                    }}
-                >
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={handleAddField}
+        <Modal
+            title={props.modalTitle || 'Form Builder'}
+            open={isOpen}
+            onCancel={handleCloseModal}
+            onOk={handleSaveForm}
+            width={props.modalWidth || 1000}
+            zIndex={zIndex}
+        >
+            <Row gutter={16}>
+                <Col span={12}>
+                    <div
+                        style={{
+                            marginBottom: 16,
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                        }}
                     >
-                        Add Field
-                    </Button>
-                </div>
-                <DragDropContext onDragEnd={handleOnDragEnd}>
-                    <Droppable droppableId="form-inputs">
-                        {(provided) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                            >
-                                {formInputs.map((item, index) => (
-                                    <FInput
-                                        key={item.id}
-                                        item={item}
-                                        index={index}
-                                        onUpdate={handleUpdateInput}
-                                        onDelete={handleDeleteInput}
-                                    />
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-            </Col>
-            <Col span={12}>
-                <h4>Form Preview</h4>
-                {getFormPreview()}
-            </Col>
-        </Row>
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={handleAddField}
+                        >
+                            Add Field
+                        </Button>
+                    </div>
+                    <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="form-inputs">
+                            {(provided) => (
+                                <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                >
+                                    {formInputs.map((item, index) => (
+                                        <FInput
+                                            key={item.id}
+                                            item={item}
+                                            index={index}
+                                            onUpdate={handleUpdateInput}
+                                            onDelete={handleDeleteInput}
+                                        />
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
+                </Col>
+                <Col span={12}>
+                    <h4>Form Preview</h4>
+                        {getFormPreview()}
+                </Col>
+            </Row>
+        </Modal>
     );
 };
 

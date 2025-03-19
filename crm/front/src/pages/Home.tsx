@@ -1,26 +1,19 @@
-import { useState } from 'react';
-import type { RootState } from 'src/store';
-import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router';
 import { useGetWebsitesQuery } from 'src/services/website/websiteService';
 import { IWebsite } from 'src/types';
-import { openModal } from 'src/features/modal/modalSlice';
 import { Button, Card, List, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CrownOutlined } from '@ant-design/icons';
 import { useAppSelector } from 'src/hooks';
-import { useCreateWebsiteModal } from 'src/modals/CreateWebsiteModal';
-import { useSubscriptionModal } from 'src/modals/SubscriptionModal';
-import { useFormBuilderModal } from 'src/modals/FormBuilderModal';
+import { useModal } from 'src/hooks/useModal';
 
 function Home() {
     const { t, i18n } = useTranslation();
-    const dispatch = useDispatch();
     const { data: websites, isLoading, error } = useGetWebsitesQuery();
     const { userInfo } = useAppSelector((state) => state.auth);
-    const openCreateWebsiteModal = useCreateWebsiteModal();
-    const openSubscriptionModal = useSubscriptionModal();
-    const openFormBuilderModal = useFormBuilderModal();
+    const { openModal: openCreateWebsiteModal } = useModal();
+    const { openModal: openSubscriptionModal } = useModal();
+    const { openModal: openFormBuilderModal } = useModal();
 
     const userSubscription = userInfo?.subscription || {
         permissions: {
@@ -37,7 +30,10 @@ function Home() {
     };
 
     const handleOpenModal = () => {
-        openCreateWebsiteModal();
+        openCreateWebsiteModal('CreateWebsiteModal', {
+            modalTitle: 'Create Website',
+            componentName: 'CreateWebsiteModal',
+        });
     };
 
     const changeLanguage = (lng: string) => {
@@ -45,11 +41,20 @@ function Home() {
     };
 
     const handleOpenSubscriptionModal = () => {
-        openSubscriptionModal();
+        openSubscriptionModal('SubscriptionModal');
     };
 
     const handleFormBuilderModal = () => {
-        openFormBuilderModal();
+        openFormBuilderModal('FormBuilderModal', {
+            modalTitle: 'Form Builder',
+            modalWidth: 1000,
+            componentName: 'FormBuilderModal',
+        }, {
+                onSave: (formInputs: any) => {
+                    console.log(formInputs);
+                }
+            }
+        );
     };
 
     // const [isModalVisible, setIsModalVisible] = useState<boolean>(false);

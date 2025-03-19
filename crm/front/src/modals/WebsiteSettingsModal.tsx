@@ -7,6 +7,7 @@ import {
     FormProps,
     Input,
     message,
+    Modal,
 } from 'antd';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import {
@@ -20,41 +21,37 @@ import DeleteConfirmation from 'src/components/helpers/DeleteConfirmation';
 import WebsiteMetadata from 'src/components/editor/WebsiteMetadata';
 import { useSubPath } from 'src/hooks/useSubPath';
 import cloneDeep from 'lodash.clonedeep';
-import { openModal } from 'src/features/modal/modalSlice';
+import { closeModal } from 'src/features/modal/modalSlice';
+import { ModalProps } from './EntryModal';
 
 type FieldType = {
     name?: string;
-};
-
-export const useWebsiteSettingsModal = () => {
-    const dispatch = useAppDispatch();
-
-    const openWebsiteSettingsModal = () => {
-        dispatch(
-            openModal({
-                modalTitle: 'Website Settings',
-                componentName: 'WebsiteSettingsModal',
-            })
-        );
-    };
-
-    return openWebsiteSettingsModal;
 };
 
 interface WebsiteSettingsModalProps {
     onComplete: (result?: any) => void;
 }
 
-const WebsiteSettingsModal: React.FC<WebsiteSettingsModalProps> = ({
-    onComplete,
-}) => {
+const WebsiteSettingsModal = (ModalProps: ModalProps) => {
+    const { id, zIndex, props, callbacks } = ModalProps;
+    const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { isOpen, props } = useSelector((state: RootState) => state.modal);
     const { userInfo } = useAppSelector((state) => state.auth);
     const currentPagePath = useSubPath({ basePath: '/editor' });
 
-    if (!userInfo) return null;
+    useEffect(() => {
+        if (props && !isOpen) {
+            setIsOpen(true);
+        } else {
+            setIsOpen(false);
+        }
+    }, [props]);
+
+    const handleCloseModal = () => {
+        callbacks?.onClose();
+        dispatch(closeModal({ modal: 'WebsiteSettingsModal', id }));
+    };
 
     const [localMetadata, setLocalMetadata] = useState<{
         title: string;
@@ -122,12 +119,18 @@ const WebsiteSettingsModal: React.FC<WebsiteSettingsModalProps> = ({
             );
             console.error('Error delete website:', err);
         } finally {
-            onComplete();
+            callbacks?.onComplete();
         }
     };
 
     return (
-        <>
+        <Modal
+            title={props.modalTitle || 'Modal'}
+            open={isOpen}
+            onCancel={handleCloseModal}
+            footer={null}
+            width={props.modalWidth || 1000}
+        >
             <Form
                 id="myForm"
                 name="basic"
@@ -167,7 +170,7 @@ const WebsiteSettingsModal: React.FC<WebsiteSettingsModalProps> = ({
                     Delete
                 </Button>
             </DeleteConfirmation>
-        </>
+        </Modal>
     );
 };
 
