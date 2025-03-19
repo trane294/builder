@@ -1,0 +1,12 @@
+html body {
+    overflow: initial !important;
+}
+.ant-layout-header {
+    height: 7vh;
+}
+#puck-preview {
+    min-height: calc(100vh - 7vh);
+}
+#puck-preview iframe {
+    min-height: calc(100vh - 7vh);
+}

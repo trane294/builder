@@ -14,7 +14,7 @@ import {
     useGetWebsiteByIdQuery,
     useUpdateWebsiteMutation,
 } from 'src/services/website/websiteService';
-import { message } from 'antd';
+import { message, Layout } from 'antd';
 import { IWebsite } from 'src/types';
 import { templatesLibrary } from 'src/templates/template';
 import { useAppSelector } from 'src/hooks';
@@ -27,11 +27,16 @@ import PagesDropdownComponent from 'src/components/editor/PagesPopup';
 import AddPageModal from 'src/modals/AddPageModal';
 import { isEqual } from 'src/utils';
 import { useWebsiteSettingsModal } from 'src/modals/WebsiteSettingsModal';
+import Editor from 'src/components/editor/Editor';
+
+const { Header, Content } = Layout;
 
 type EditorPageProps = {};
 
 export default function EditorPage(props: EditorPageProps) {
-    const emtpyPage = JSON.parse('{"root":{"props":{}},"content":[],"zones":{}}');
+    const emtpyPage = JSON.parse(
+        '{"root":{"props":{}},"content":[],"zones":{}}'
+    );
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
@@ -99,7 +104,7 @@ export default function EditorPage(props: EditorPageProps) {
 
         const locationParts = location.pathname.split('/');
         let locationPathPart = locationParts[3];
-        if (!locationPathPart)  locationPathPart = '/';
+        if (!locationPathPart) locationPathPart = '/';
         if (locationPathPart !== currentPagePath) return;
 
         console.log(
@@ -183,7 +188,9 @@ export default function EditorPage(props: EditorPageProps) {
 
     const handleAddNewPage = async (path: string) => {
         const website = await saveWebsiteState();
-        const emptyPage = JSON.parse('{"root":{"props":{}},"content":[],"zones":{}}');
+        const emptyPage = JSON.parse(
+            '{"root":{"props":{}},"content":[],"zones":{}}'
+        );
 
         try {
             let _website = cloneDeep(website);
@@ -274,7 +281,8 @@ export default function EditorPage(props: EditorPageProps) {
                 onClose={() => setIsAddPageModalOpen(false)}
                 onAddPage={handleAddNewPage}
             />
-            <Puck
+            <Editor config={config} data={puckData} onPublish={handleSave} />
+            {/* <Puck
                 config={config}
                 data={puckData}
                 onPublish={handleSave}
@@ -341,7 +349,7 @@ export default function EditorPage(props: EditorPageProps) {
                         );
                     },
                 }}
-            />
+            /> */}
         </>
     );
 }
