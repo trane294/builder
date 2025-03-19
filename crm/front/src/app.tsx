@@ -13,7 +13,7 @@ import { useAppDispatch } from 'src/hooks';
 import { useGetUserDetailsQuery } from 'src/services/auth/authService';
 import { setUserDetails } from 'src/features/auth/authSlice';
 import { useEffect } from 'react';
-import EntryModal from './modals/EntryModal';
+// import EntryModal from './modals/EntryModal';
 import SettingsPage from './pages/Settings';
 
 const App = () => {
@@ -57,7 +57,7 @@ const App = () => {
                     </Route>
                 </Route>
             </Routes>
-            <EntryModal />
+            {/* <EntryModal /> */}
         </>
     );
 };

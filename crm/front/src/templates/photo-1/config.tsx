@@ -1,5 +1,5 @@
 import { Button, Config, FieldProps } from '@measured/puck';
-import ImageUploader from 'src/components/editor/ImageUploader';
+// import ImageUploader from 'src/components/editor/ImageUploader';
 import { useAppSelector } from 'src/hooks';
 import FooterPhoto1 from 'src/templates/photo-1/footer';
 import HeroPhoto1 from 'src/templates/photo-1/hero';
@@ -56,10 +56,11 @@ export const photo1Config = (
                 imageUrl: {
                     type: 'custom',
                     render: ({ field, value, onChange }: FieldProps) => (
-                        <ImageUploader
-                            value={value}
-                            onChange={(url) => onChange({ field, value: url })}
-                        />
+                        // <ImageUploader
+                        //     value={value}
+                        //     onChange={(url) => onChange({ field, value: url })}
+                        // />
+                        <div>123</div>
                     ),
                 },
             },

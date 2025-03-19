@@ -9,18 +9,18 @@ import { Button, Card, List, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { CrownOutlined } from '@ant-design/icons';
 import { useAppSelector } from 'src/hooks';
-import { useCreateWebsiteModal } from 'src/modals/CreateWebsiteModal';
-import { useSubscriptionModal } from 'src/modals/SubscriptionModal';
-import { useFormBuilderModal } from 'src/modals/FormBuilderModal';
+// import { useCreateWebsiteModal } from 'src/modals/CreateWebsiteModal';
+// import { useSubscriptionModal } from 'src/modals/SubscriptionModal';
+// import { useFormBuilderModal } from 'src/modals/FormBuilderModal';
 
 function Home() {
     const { t, i18n } = useTranslation();
     const dispatch = useDispatch();
     const { data: websites, isLoading, error } = useGetWebsitesQuery();
     const { userInfo } = useAppSelector((state) => state.auth);
-    const openCreateWebsiteModal = useCreateWebsiteModal();
-    const openSubscriptionModal = useSubscriptionModal();
-    const openFormBuilderModal = useFormBuilderModal();
+    // const openCreateWebsiteModal = useCreateWebsiteModal();
+    // const openSubscriptionModal = useSubscriptionModal();
+    // const openFormBuilderModal = useFormBuilderModal();
 
     const userSubscription = userInfo?.subscription || {
         permissions: {
@@ -37,7 +37,7 @@ function Home() {
     };
 
     const handleOpenModal = () => {
-        openCreateWebsiteModal();
+        // openCreateWebsiteModal();
     };
 
     const changeLanguage = (lng: string) => {
@@ -45,11 +45,11 @@ function Home() {
     };
 
     const handleOpenSubscriptionModal = () => {
-        openSubscriptionModal();
+        // openSubscriptionModal();
     };
 
     const handleFormBuilderModal = () => {
-        openFormBuilderModal();
+        // openFormBuilderModal();
     };
 
     // const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
